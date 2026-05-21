@@ -1,0 +1,2012 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ayyıldız Çiçekçilik - Online Çiçek Siparişi ve Aynı Gün Teslimat</title>
+    <style>
+        /* ============ TEMEL AYARLAR ============ */
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        html { scroll-behavior: smooth; }
+        body { background: radial-gradient(circle at top left, rgba(233,30,99,0.14), transparent 24%), radial-gradient(circle at bottom right, rgba(244,143,177,0.12), transparent 22%), #ffffff; color: #333; min-height: 100vh; overflow-x: hidden; }
+        a { text-decoration: none; color: inherit; }
+        img { max-width: 100%; display: block; }
+        button { font-family: inherit; }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 15px; }
+
+        /* ============ DUYURU BARI ============ */
+        .announcement-bar {
+            background: linear-gradient(90deg, #e91e63, #f06292);
+            color: white;
+            text-align: center;
+            padding: 8px 40px;
+            font-size: 13px;
+            font-weight: 500;
+            position: relative;
+            transition: all 0.3s;
+        }
+        .announcement-bar.hidden { display: none; }
+        .close-announcement {
+            position: absolute; right: 15px; top: 50%; transform: translateY(-50%);
+            background: none; border: none; color: white; cursor: pointer; font-size: 16px; opacity: 0.8;
+        }
+        .close-announcement:hover { opacity: 1; }
+
+        /* ============ HEADER ============ */
+        header {
+            padding: 20px 0 10px 0;
+            border-bottom: 1px solid rgba(238,238,238,0.7);
+            background: rgba(255,255,255,0.94);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            transition: all 0.3s;
+        }
+        header.scrolled { padding: 10px 0 5px 0; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+
+        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; gap: 20px; }
+
+        .mobile-menu-toggle {
+            display: none; background: none; border: none; font-size: 24px; cursor: pointer; color: #555;
+        }
+
+        .logo {
+            font-size: 22px; font-weight: bold; color: #e91e63; white-space: nowrap;
+            display: flex; align-items: center; gap: 16px;
+        }
+        .logo img {
+            height: 72px; width: auto; display: block; object-fit: contain;
+            border-radius: 24px; box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+        }
+        .logo span { display: inline-block; line-height: 1.05; }
+
+        .search-container { position: relative; flex-grow: 1; max-width: 600px; }
+        .search-box { display: flex; border: 1px solid #ccc; border-radius: 4px; overflow: hidden; transition: border-color 0.2s; }
+        .search-box:focus-within { border-color: #e91e63; }
+        .search-box input { width: 100%; padding: 12px; border: none; outline: none; font-size: 14px; }
+        .search-box button {
+            padding: 0 20px; background: #e91e63; color: white; border: none; cursor: pointer; font-size: 16px;
+            transition: background 0.2s;
+        }
+        .search-box button:hover { background: #c2185b; }
+        .search-suggestions {
+            position: absolute; top: 100%; left: 0; right: 0; background: white;
+            border: 1px solid #ddd; border-top: none; border-radius: 0 0 4px 4px;
+            max-height: 300px; overflow-y: auto; z-index: 50; display: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .search-suggestions.active { display: block; }
+        .suggestion-item {
+            padding: 10px 15px; cursor: pointer; display: flex; align-items: center; gap: 10px;
+            border-bottom: 1px solid #f5f5f5; font-size: 14px;
+        }
+        .suggestion-item:hover { background: #fce4ec; }
+        .suggestion-item:last-child { border-bottom: none; }
+
+        .header-actions { display: flex; gap: 18px; font-size: 13px; align-items: center; }
+        .action-item {
+            display: flex; align-items: center; gap: 6px; cursor: pointer; position: relative;
+            padding: 8px 4px; transition: color 0.2s;
+        }
+        .action-item:hover { color: #e91e63; }
+        .action-item .icon { font-size: 18px; }
+        .action-item .badge {
+            position: absolute; top: 0; right: -5px; background: #e91e63; color: white;
+            border-radius: 50%; width: 18px; height: 18px; font-size: 11px;
+            display: flex; align-items: center; justify-content: center; font-weight: bold;
+        }
+        .cart-btn {
+            background: #e91e63; color: white !important; padding: 10px 18px;
+            border-radius: 4px; font-weight: bold; transition: background 0.2s;
+        }
+        .cart-btn:hover { background: #c2185b; }
+        .cart-btn .badge { background: white; color: #e91e63; right: -8px; top: -5px; }
+
+        /* ============ ACCOUNT DROPDOWN ============ */
+        .account-dropdown {
+            position: absolute; top: 100%; right: 0; background: white;
+            border: 1px solid #eee; border-radius: 6px; min-width: 200px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1); padding: 10px 0;
+            display: none; z-index: 200; margin-top: 5px;
+        }
+        .account-item:hover .account-dropdown { display: block; }
+        .account-dropdown a {
+            display: block; padding: 10px 18px; font-size: 13px; color: #333; transition: all 0.2s;
+        }
+        .account-dropdown a:hover { background: #fce4ec; color: #e91e63; }
+
+        /* ============ METİN MENÜ ============ */
+        .text-nav { display: flex; gap: 25px; font-size: 14px; font-weight: 500; color: #555; flex-wrap: wrap; }
+        .text-nav a {
+            position: relative; padding: 5px 0; transition: color 0.2s;
+        }
+        .text-nav a:hover, .text-nav a.active { color: #e91e63; }
+        .text-nav a.active::after {
+            content: ""; position: absolute; bottom: -3px; left: 0; right: 0; height: 2px; background: #e91e63;
+        }
+
+        /* ============ YUVARLAK KATEGORİ ============ */
+        .circle-menu {
+            display: flex; gap: 20px; overflow-x: auto; padding: 20px 0;
+            border-bottom: 1px solid #eee; scrollbar-width: none;
+        }
+        .circle-menu::-webkit-scrollbar { display: none; }
+        .circle-item {
+            display: flex; flex-direction: column; align-items: center; min-width: 85px; gap: 10px;
+            cursor: pointer; transition: transform 0.2s;
+        }
+        .circle-item:hover { transform: translateY(-3px); }
+        .circle-img {
+            width: 80px; height: 80px; border-radius: 50%; border: 2px solid #ddd;
+            background-color: #f5f5f5; overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 36px; transition: border-color 0.2s;
+        }
+        .circle-item:hover .circle-img { border-color: #e91e63; }
+        .circle-item.active .circle-img { border-color: #e91e63; box-shadow: 0 0 0 3px #fce4ec; }
+        .circle-item span { font-size: 12px; text-align: center; font-weight: 500; line-height: 1.3; }
+
+        /* ============ BANNER ============ */
+        .banner-section { padding: 20px 0; display: flex; flex-direction: column; gap: 15px; }
+        .banner {
+            border-radius: 8px; overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: bold; color: #555; position: relative;
+            cursor: pointer; transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .banner:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(0,0,0,0.12); }
+        .banner.has-bg { position: relative; overflow: hidden; }
+        .banner.has-bg::before {
+            content: ""; position: absolute; inset: 0;
+            background: linear-gradient(180deg, rgba(0,0,0,0.12), rgba(0,0,0,0.24));
+            pointer-events: none;
+        }
+        .banner .banner-content {
+            text-align: center; padding: 20px; position: relative; z-index: 2;
+        }
+        .hero-slide .banner-content {
+            text-align: left; padding: 28px 36px; max-width: 520px;
+        }
+        .hero-slide .banner-eyebrow {
+            display: inline-flex; align-items: center;
+            background: rgba(255,255,255,0.92); color: #c2185b;
+            border-radius: 999px; padding: 8px 16px; font-size: 12px;
+            font-weight: 700; letter-spacing: 0.6px; margin-bottom: 16px;
+        }
+        .banner .banner-title {
+            font-size: 22px; font-weight: 800; letter-spacing: 1px; margin-bottom: 8px;
+            color: #ffffff; text-shadow: 0 1px 18px rgba(0,0,0,0.35);
+        }
+        .banner .banner-sub {
+            font-size: 14px; font-weight: 500; color: rgba(255,255,255,0.92); max-width: 420px;
+            line-height: 1.6; margin-bottom: 20px;
+        }
+        .hero-buttons { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+        .hero-cta, .hero-outline {
+            display: inline-flex; align-items: center; justify-content: center;
+            padding: 14px 26px; border-radius: 999px; font-weight: 700;
+            transition: all 0.2s ease;
+        }
+        .hero-cta {
+            background: #e91e63; color: white; box-shadow: 0 18px 40px rgba(233,30,99,0.18);
+        }
+        .hero-cta:hover { background: #c2185b; }
+        .hero-outline {
+            border: 2px solid rgba(255,255,255,0.9); color: white;
+            background: rgba(255,255,255,0.18);
+        }
+        .hero-outline:hover { background: rgba(255,255,255,0.3); }
+
+        /* Hero slider */
+        .hero-slider { position: relative; height: 260px; border-radius: 8px; overflow: hidden; }
+        .hero-slides { display: flex; height: 100%; transition: transform 0.5s ease; }
+        .hero-slide {
+            min-width: 100%; height: 100%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: bold; color: #555; position: relative;
+        }
+        .hero-dots {
+            position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%);
+            display: flex; gap: 8px; z-index: 3;
+        }
+        .hero-dot {
+            width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.6);
+            cursor: pointer; transition: all 0.2s;
+        }
+        .hero-dot.active { background: white; width: 24px; border-radius: 5px; }
+        .hero-arrow {
+            position: absolute; top: 50%; transform: translateY(-50%);
+            background: rgba(255,255,255,0.8); border: none; width: 36px; height: 36px;
+            border-radius: 50%; cursor: pointer; font-size: 18px; z-index: 3;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s;
+        }
+        .hero-arrow:hover { background: white; }
+        .hero-arrow.prev { left: 15px; }
+        .hero-arrow.next { right: 15px; }
+
+        .row-1 { display: grid; grid-template-columns: 2fr 1fr; gap: 15px; height: 260px; }
+        .row-2 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; height: 180px; }
+        .row-3 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; height: 220px; }
+
+        /* ============ SECTION HEADER ============ */
+        .section-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 20px 0; flex-wrap: wrap; gap: 15px;
+        }
+        .section-header h2 {
+            font-size: 22px; color: #222; font-weight: 700;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .section-header h2::before {
+            content: ""; width: 4px; height: 24px; background: #e91e63; border-radius: 2px;
+        }
+        .sort-filter { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .sort-filter select, .sort-filter button {
+            padding: 8px 14px; border: 1px solid #ddd; border-radius: 4px;
+            background: white; font-size: 13px; cursor: pointer; color: #555;
+            transition: border-color 0.2s;
+        }
+        .sort-filter select:hover, .sort-filter button:hover { border-color: #e91e63; }
+        .filter-tag {
+            background: #fce4ec; color: #e91e63; border: 1px solid #f8bbd0 !important;
+            display: inline-flex; align-items: center; gap: 6px; font-weight: 500;
+        }
+        .filter-tag .remove { font-size: 16px; line-height: 1; }
+
+        /* ============ ÜRÜNLER ============ */
+        .products-grid {
+            display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; padding-bottom: 30px;
+        }
+        @media (max-width: 992px) { .products-grid { grid-template-columns: repeat(3, 1fr); } }
+        @media (max-width: 768px) { .products-grid { grid-template-columns: repeat(2, 1fr); } }
+
+        .product-card {
+            border: 1px solid #eee; border-radius: 8px; padding: 15px; position: relative;
+            transition: all 0.3s; background: white; cursor: pointer;
+            display: flex; flex-direction: column;
+        }
+        .product-card:hover { box-shadow: 0 8px 25px rgba(0,0,0,0.1); transform: translateY(-4px); border-color: #fce4ec; }
+
+        .product-badges {
+            position: absolute; top: 15px; left: 15px; display: flex; flex-direction: column; gap: 5px; z-index: 5;
+        }
+        .badge-pill {
+            background: #e91e63; color: white; font-size: 10px; padding: 4px 8px;
+            border-radius: 3px; font-weight: 700; letter-spacing: 0.5px;
+        }
+        .badge-pill.new { background: #2e7d32; }
+        .badge-pill.bestseller { background: #f57c00; }
+
+        .fav-btn {
+            position: absolute; top: 12px; right: 12px; background: white; border: 1px solid #eee;
+            width: 32px; height: 32px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px; color: #ccc; cursor: pointer; z-index: 10;
+            transition: all 0.2s;
+        }
+        .fav-btn:hover { color: #e91e63; border-color: #e91e63; }
+        .fav-btn.active { color: #e91e63; border-color: #e91e63; background: #fce4ec; }
+
+        .product-img {
+            height: 220px; background: linear-gradient(135deg, #fafafa, #f5f5f5);
+            border-radius: 6px; margin-bottom: 15px; overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 80px; position: relative;
+        }
+        .product-img img {
+            width: 100%; height: 100%; object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+        .product-card:hover .product-img img { transform: scale(1.08); }
+        .product-img .deco {
+            position: absolute; opacity: 0.15; font-size: 30px;
+        }
+        .product-img .deco-1 { top: 15px; left: 20px; z-index: 2; }
+        .product-img .deco-2 { bottom: 15px; right: 20px; transform: rotate(20deg); z-index: 2; }
+
+        .quick-view {
+            position: absolute; bottom: 10px; left: 10px; right: 10px;
+            background: rgba(33, 33, 33, 0.85); color: white; border: none;
+            padding: 8px; border-radius: 4px; font-size: 12px; font-weight: 600;
+            cursor: pointer; opacity: 0; transform: translateY(10px);
+            transition: all 0.3s;
+        }
+        .product-card:hover .quick-view { opacity: 1; transform: translateY(0); }
+        .quick-view:hover { background: #e91e63; }
+
+        .shipping-badge {
+            font-size: 11px; color: #2e7d32; font-weight: 600;
+            display: flex; align-items: center; gap: 5px; margin-bottom: 8px;
+        }
+        .product-title {
+            font-size: 13px; color: #333; margin-bottom: 8px; height: 38px; overflow: hidden;
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-height: 1.4;
+        }
+        .rating {
+            color: #333; font-size: 11px; margin-bottom: 12px;
+            display: flex; align-items: center; gap: 5px;
+        }
+        .stars { color: #ffb300; letter-spacing: 2px; }
+
+        .price-row { display: flex; flex-direction: column; gap: 2px; margin-bottom: 10px; }
+        .old-price { font-size: 12px; color: #999; text-decoration: line-through; }
+        .price { font-size: 18px; font-weight: 700; color: #222; display: flex; align-items: center; gap: 8px; }
+        .discount-tag {
+            background: #fce4ec; color: #e91e63; font-size: 10px; font-weight: 700;
+            padding: 2px 6px; border-radius: 3px;
+        }
+
+        .add-to-cart {
+            background: #e91e63; color: white; border: none; padding: 10px;
+            border-radius: 4px; font-weight: 600; font-size: 13px; cursor: pointer;
+            transition: background 0.2s; margin-top: auto;
+            display: flex; align-items: center; justify-content: center; gap: 5px;
+        }
+        .add-to-cart:hover { background: #c2185b; }
+
+        .load-more-wrap { text-align: center; padding: 20px 0 50px 0; }
+        .load-more {
+            background: white; color: #e91e63; border: 2px solid #e91e63;
+            padding: 12px 35px; border-radius: 4px; font-weight: 600; cursor: pointer;
+            transition: all 0.2s;
+        }
+        .load-more:hover { background: #e91e63; color: white; }
+        .load-more:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .no-results { grid-column: 1/-1; text-align: center; padding: 40px; color: #888; font-size: 15px; }
+
+        /* ============ NEWSLETTER ============ */
+        .newsletter {
+            background: linear-gradient(135deg, #fce4ec, #f8bbd0);
+            border-radius: 12px; padding: 40px;
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 30px; margin: 30px 0; flex-wrap: wrap;
+        }
+        .newsletter-text h3 { font-size: 22px; color: #c2185b; margin-bottom: 6px; }
+        .newsletter-text p { color: #555; font-size: 14px; }
+        .newsletter-form { display: flex; gap: 8px; flex-grow: 1; max-width: 450px; }
+        .newsletter-form input {
+            flex-grow: 1; padding: 12px 15px; border: 1px solid #f8bbd0;
+            border-radius: 4px; font-size: 14px; outline: none;
+        }
+        .newsletter-form button {
+            background: #e91e63; color: white; border: none; padding: 12px 25px;
+            border-radius: 4px; font-weight: 600; cursor: pointer;
+            transition: background 0.2s;
+        }
+        .newsletter-form button:hover { background: #c2185b; }
+
+        /* ============ CHECKOUT / WHATSAPP SİPARİŞ ============ */
+        .checkout-section, .contact-section {
+            background: rgba(255,255,255,0.96); border: 1px solid #f0ebf1; border-radius: 16px;
+            padding: 30px; margin: 30px 0;
+            box-shadow: 0 20px 60px rgba(233,30,99,0.05);
+            backdrop-filter: blur(8px);
+        }
+        .order-grid, .contact-section {
+            display: grid; grid-template-columns: 1.3fr 0.9fr; gap: 24px;
+        }
+        .order-card, .contact-card {
+            background: #fff; border: 1px solid #f0f0f0; border-radius: 14px;
+            padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+        }
+        .checkout-section h2, .contact-section h2, .order-card h3, .contact-card h3 {
+            color: #c2185b; margin-bottom: 18px; font-size: 22px;
+        }
+        .order-summary-item {
+            display: flex; justify-content: space-between; gap: 12px; font-size: 14px;
+            color: #444; margin-bottom: 12px;
+        }
+        .order-summary-item strong { color: #222; }
+        .order-total {
+            margin-top: 20px; display: flex; justify-content: space-between;
+            align-items: center; padding-top: 14px; border-top: 1px solid #f0f0f0;
+            font-size: 16px; font-weight: 700; color: #222;
+        }
+        .order-note {
+            margin-top: 16px; color: #666; font-size: 13px; line-height: 1.6;
+        }
+        .order-form label {
+            display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px;
+            font-size: 14px; color: #444;
+        }
+        .order-form input, .order-form textarea {
+            width: 100%; padding: 12px 14px; border: 1px solid #eee;
+            border-radius: 10px; font-size: 14px; outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .order-form input:focus, .order-form textarea:focus {
+            border-color: #e91e63; box-shadow: 0 0 0 3px rgba(233,30,99,0.08);
+        }
+        .order-form textarea { min-height: 100px; resize: vertical; }
+        .order-form .optional { font-size: 12px; color: #888; }
+        .contact-card p { color: #555; line-height: 1.8; margin-bottom: 18px; }
+        .whatsapp-button {
+            display: inline-flex; align-items: center; justify-content: center;
+            gap: 10px; padding: 14px 18px; border-radius: 999px;
+            background: #25d366; color: white; font-weight: 700; text-decoration: none;
+            transition: background 0.2s;
+        }
+        .whatsapp-button:hover { background: #1ebc5c; }
+        .contact-info-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 14px; }
+        .contact-info-list li { display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: start; color: #444; line-height: 1.7; }
+        .contact-info-list li span { font-size: 20px; line-height: 1; }
+
+        /* ============ FOOTER ============ */
+        footer {
+            background: linear-gradient(180deg, #fff5f7, #fafafa);
+            padding: 40px 0 20px 0; margin-top: 30px;
+            border-top: 1px solid rgba(238,238,238,0.7);
+        }
+        .footer-grid {
+            display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 30px; margin-bottom: 30px;
+        }
+        @media (max-width: 768px) { .footer-grid { grid-template-columns: 1fr 1fr; } }
+        .footer-col h4 {
+            font-size: 14px; color: #222; margin-bottom: 15px; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .footer-col p, .footer-col a {
+            font-size: 13px; color: #666; line-height: 2; display: block;
+            transition: color 0.2s;
+        }
+        .footer-col a:hover { color: #e91e63; }
+        .footer-brand .logo { font-size: 22px; margin-bottom: 10px; }
+        .social-icons { display: flex; gap: 10px; margin-top: 15px; }
+        .social-icons a {
+            width: 36px; height: 36px; border-radius: 50%; background: #fce4ec;
+            color: #e91e63; display: flex; align-items: center; justify-content: center;
+            font-size: 16px; transition: all 0.2s;
+        }
+        .social-icons a:hover { background: #e91e63; color: white; }
+        .payment-icons { display: flex; gap: 8px; flex-wrap: wrap; }
+        .payment-icons span {
+            background: white; border: 1px solid #ddd; padding: 4px 10px; border-radius: 4px;
+            font-size: 10px; font-weight: 700; color: #555;
+        }
+        .footer-bottom {
+            border-top: 1px solid #eee; padding-top: 20px; text-align: center;
+            font-size: 12px; color: #888;
+        }
+
+        /* ============ SIDEBAR (Cart, Favorites) ============ */
+        .sidebar {
+            position: fixed; top: 0; right: -420px; width: 400px; max-width: 100%; height: 100vh;
+            background: white; box-shadow: -4px 0 30px rgba(0,0,0,0.15); z-index: 1000;
+            display: flex; flex-direction: column;
+            transition: right 0.3s ease;
+        }
+        .sidebar.active { right: 0; }
+        .sidebar-header {
+            padding: 20px; border-bottom: 1px solid #eee;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .sidebar-header h3 { font-size: 18px; color: #222; }
+        .sidebar-close {
+            background: none; border: none; font-size: 22px; cursor: pointer; color: #555;
+            transition: color 0.2s;
+        }
+        .sidebar-close:hover { color: #e91e63; }
+        .sidebar-body { flex-grow: 1; overflow-y: auto; padding: 15px; }
+        .sidebar-footer { padding: 20px; border-top: 1px solid #eee; background: #fafafa; }
+
+        .cart-item, .fav-item {
+            display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid #f5f5f5;
+            align-items: center;
+        }
+        .cart-item:last-child, .fav-item:last-child { border-bottom: none; }
+        .cart-item-img, .fav-item-img {
+            width: 70px; height: 70px; border-radius: 6px; background: #fafafa;
+            display: flex; align-items: center; justify-content: center; font-size: 32px;
+            flex-shrink: 0; overflow: hidden;
+        }
+        .cart-item-img img, .fav-item-img img {
+            width: 100%; height: 100%; object-fit: cover;
+        }
+        .suggestion-item img {
+            width: 40px; height: 40px; border-radius: 4px; object-fit: cover;
+        }
+        .modal-img img {
+            width: 100%; height: 100%; object-fit: cover;
+        }
+        .modal-img {
+            min-height: 350px; max-height: 500px; overflow: hidden; padding: 0;
+        }
+        .cart-item-info, .fav-item-info { flex-grow: 1; min-width: 0; }
+        .cart-item-info h4, .fav-item-info h4 {
+            font-size: 13px; color: #333; margin-bottom: 6px; line-height: 1.4;
+            overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+        }
+        .cart-item-info .price, .fav-item-info .price { font-size: 14px; }
+        .qty-control {
+            display: flex; align-items: center; gap: 8px; margin-top: 8px;
+        }
+        .qty-control button {
+            width: 24px; height: 24px; border: 1px solid #ddd; background: white;
+            cursor: pointer; border-radius: 3px; font-size: 14px; font-weight: 600;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s;
+        }
+        .qty-control button:hover { border-color: #e91e63; color: #e91e63; }
+        .qty-control span { font-size: 13px; min-width: 20px; text-align: center; }
+
+        .remove-item {
+            background: none; border: none; color: #999; cursor: pointer;
+            font-size: 18px; padding: 4px; transition: color 0.2s;
+        }
+        .remove-item:hover { color: #e91e63; }
+
+        .cart-summary { margin-bottom: 15px; }
+        .cart-summary-row {
+            display: flex; justify-content: space-between; padding: 6px 0;
+            font-size: 14px; color: #555;
+        }
+        .cart-summary-row.total {
+            border-top: 1px solid #ddd; padding-top: 12px; margin-top: 8px;
+            font-size: 17px; font-weight: 700; color: #222;
+        }
+        .total-amount { color: #e91e63; }
+        .checkout-btn {
+            width: 100%; background: #e91e63; color: white; border: none;
+            padding: 14px; border-radius: 4px; font-weight: 600; font-size: 15px;
+            cursor: pointer; transition: background 0.2s;
+        }
+        .checkout-btn:hover { background: #c2185b; }
+        .checkout-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .empty-state { text-align: center; padding: 40px 20px; color: #888; }
+        .empty-state .icon { font-size: 50px; margin-bottom: 15px; opacity: 0.4; }
+        .empty-state p { font-size: 14px; margin-bottom: 15px; }
+        .empty-state button {
+            background: #e91e63; color: white; border: none; padding: 10px 25px;
+            border-radius: 4px; cursor: pointer; font-weight: 600;
+        }
+
+        /* ============ MODAL ============ */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 999;
+            display: none; align-items: center; justify-content: center;
+            opacity: 0; transition: opacity 0.3s;
+        }
+        .modal-overlay.active { display: flex; opacity: 1; }
+        .modal {
+            background: white; border-radius: 10px; max-width: 800px; width: 90%;
+            max-height: 90vh; overflow: hidden;
+            transform: scale(0.95); transition: transform 0.3s;
+            display: grid; grid-template-columns: 1fr 1fr;
+        }
+        @media (max-width: 700px) { .modal { grid-template-columns: 1fr; } }
+        .modal-overlay.active .modal { transform: scale(1); }
+        .modal-img {
+            background: linear-gradient(135deg, #fce4ec, #f8bbd0);
+            min-height: 350px; display: flex; align-items: center; justify-content: center;
+            font-size: 140px; position: relative;
+        }
+        .modal-close {
+            position: absolute; top: 15px; right: 15px; background: white; border: none;
+            width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 18px;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1); z-index: 10;
+        }
+        .modal-content { padding: 30px; overflow-y: auto; }
+        .modal-content .product-title { font-size: 18px; height: auto; -webkit-line-clamp: unset; margin-bottom: 12px; }
+        .modal-content .price { font-size: 24px; margin: 15px 0; }
+        .modal-desc { font-size: 14px; color: #666; line-height: 1.6; margin: 15px 0; }
+        .modal-features { margin: 15px 0; }
+        .modal-features li {
+            list-style: none; padding: 6px 0; font-size: 13px; color: #555;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .modal-features li::before { content: "✓"; color: #2e7d32; font-weight: 700; }
+        .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+        .modal-actions .add-to-cart { flex-grow: 1; margin-top: 0; padding: 13px; }
+        .modal-actions .fav-btn { position: static; width: 48px; height: 48px; font-size: 20px; }
+
+        /* ============ TOAST ============ */
+        .toast-container {
+            position: fixed; top: 100px; right: 20px; z-index: 2000;
+            display: flex; flex-direction: column; gap: 10px;
+        }
+        .toast {
+            background: white; padding: 14px 20px; border-radius: 6px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15); border-left: 4px solid #2e7d32;
+            display: flex; align-items: center; gap: 10px; font-size: 14px;
+            min-width: 280px; max-width: 360px;
+            animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.5s forwards;
+        }
+        .toast.error { border-left-color: #e91e63; }
+        .toast.info { border-left-color: #1976d2; }
+        .toast .icon { font-size: 20px; }
+        @keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes fadeOut { to { opacity: 0; transform: translateX(20%); } }
+
+        /* ============ OVERLAY ============ */
+        .overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 999;
+            opacity: 0; visibility: hidden; transition: all 0.3s;
+        }
+        .overlay.active { opacity: 1; visibility: visible; }
+
+        /* ============ WHATSAPP FLOAT BUTTON ============ */
+        .whatsapp-float {
+            position: fixed; bottom: 25px; right: 25px; z-index: 500;
+            width: 60px; height: 60px; border-radius: 50%;
+            background: #25d366; color: white;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 32px; cursor: pointer;
+            box-shadow: 0 5px 25px rgba(37, 211, 102, 0.45);
+            transition: all 0.3s; text-decoration: none;
+            animation: wppulse 2s infinite;
+        }
+        .whatsapp-float:hover {
+            transform: scale(1.1); box-shadow: 0 8px 30px rgba(37, 211, 102, 0.6);
+        }
+        .whatsapp-float::before {
+            content: ""; position: absolute; inset: -5px; border-radius: 50%;
+            border: 2px solid #25d366; opacity: 0;
+            animation: wpring 2s infinite;
+        }
+        @keyframes wppulse { 0%,100%{transform:scale(1);} 50%{transform:scale(1.05);} }
+        @keyframes wpring { 0%{transform:scale(1);opacity:0.7;} 100%{transform:scale(1.4);opacity:0;} }
+        .whatsapp-tooltip {
+            position: absolute; right: 75px; top: 50%; transform: translateY(-50%);
+            background: #333; color: white; padding: 8px 12px; border-radius: 4px;
+            font-size: 13px; white-space: nowrap; opacity: 0; pointer-events: none;
+            transition: opacity 0.2s;
+        }
+        .whatsapp-tooltip::after {
+            content: ""; position: absolute; right: -5px; top: 50%; transform: translateY(-50%);
+            border-style: solid; border-width: 5px 0 5px 5px;
+            border-color: transparent transparent transparent #333;
+        }
+        .whatsapp-float:hover .whatsapp-tooltip { opacity: 1; }
+
+        /* ============ INFO MODAL (Hakkımızda, İade vb.) ============ */
+        .info-modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1100;
+            display: none; align-items: center; justify-content: center;
+            opacity: 0; transition: opacity 0.3s; padding: 20px;
+        }
+        .info-modal-overlay.active { display: flex; opacity: 1; }
+        .info-modal {
+            background: white; border-radius: 12px; max-width: 700px; width: 100%;
+            max-height: 85vh; overflow: hidden;
+            transform: scale(0.95); transition: transform 0.3s;
+            display: flex; flex-direction: column;
+        }
+        .info-modal-overlay.active .info-modal { transform: scale(1); }
+        .info-modal-header {
+            padding: 25px 30px; border-bottom: 1px solid #f0f0f0;
+            display: flex; justify-content: space-between; align-items: center;
+            background: linear-gradient(135deg, #fce4ec, #f8bbd0);
+        }
+        .info-modal-header h2 {
+            font-size: 22px; color: #c2185b; font-weight: 700;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .info-modal-body {
+            padding: 30px; overflow-y: auto; line-height: 1.7; color: #444; font-size: 14px;
+        }
+        .info-modal-body h3 {
+            color: #e91e63; font-size: 17px; margin: 20px 0 10px 0;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .info-modal-body h3:first-child { margin-top: 0; }
+        .info-modal-body p { margin-bottom: 12px; }
+        .info-modal-body ul { padding-left: 0; list-style: none; margin-bottom: 12px; }
+        .info-modal-body ul li {
+            padding: 6px 0 6px 28px; position: relative;
+        }
+        .info-modal-body ul li::before {
+            content: "✿"; position: absolute; left: 8px; color: #e91e63; font-size: 14px;
+        }
+        .info-modal-body .highlight-box {
+            background: #fce4ec; border-left: 4px solid #e91e63;
+            padding: 15px 20px; border-radius: 6px; margin: 15px 0;
+        }
+        .info-modal-close {
+            background: white; border: 1px solid #e91e63; color: #e91e63;
+            width: 36px; height: 36px; border-radius: 50%; cursor: pointer; font-size: 16px;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s;
+        }
+        .info-modal-close:hover { background: #e91e63; color: white; }
+
+        /* ============ RESPONSIVE ============ */
+        @media (max-width: 992px) {
+            .header-actions .action-item span:not(.icon):not(.badge) { display: none; }
+            .text-nav { gap: 15px; font-size: 13px; }
+            .row-1 { grid-template-columns: 1fr; height: auto; }
+            .row-1 > div { height: auto; }
+            .hero-slide .banner-content { text-align: center; padding: 22px 20px; max-width: 100%; }
+            .hero-buttons { justify-content: center; }
+        }
+        @media (max-width: 768px) {
+            .mobile-menu-toggle { display: block; }
+            .text-nav { display: none; }
+            .text-nav.mobile-open {
+                display: flex; flex-direction: column; gap: 10px;
+                padding: 15px; background: #fafafa; border-radius: 6px;
+            }
+            .hero-cta, .hero-outline { width: 100%; }
+            .search-container { order: 3; max-width: 100%; flex-basis: 100%; }
+            .row-2, .row-3 { grid-template-columns: 1fr; height: auto; }
+            .row-2 > div, .row-3 > div { height: 130px; }
+            .header-actions { gap: 10px; }
+            .header-actions .action-item:not(.cart-btn) span:not(.badge) { display: none; }
+            .section-header { flex-direction: column; align-items: flex-start; }
+            .newsletter { padding: 25px; flex-direction: column; text-align: center; }
+            .newsletter-form { width: 100%; }
+            .order-grid, .contact-section { grid-template-columns: 1fr; }
+            .checkout-section, .contact-section { padding: 22px; }
+            .order-card, .contact-card { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Duyuru Barı -->
+<div class="announcement-bar" id="announcementBar">
+    <p>🚚 Bartın Merkez içinde 250 TL ve üzeri siparişlerde aynı gün ücretsiz teslimat! 12:00'ye kadar sipariş ver, bugün kapında.</p>
+    <button class="close-announcement" onclick="document.getElementById('announcementBar').classList.add('hidden')">✕</button>
+</div>
+
+<!-- Header -->
+<header id="mainHeader">
+    <div class="container">
+        <div class="header-top">
+            <button class="mobile-menu-toggle" id="mobileMenuToggle">☰</button>
+            <a href="#" class="logo">
+                <img src="logo.png" alt="Ayyıldız Çiçekçilik Logo">
+                <span>Ayyıldız <strong>Çiçekçilik</strong></span>
+            </a>
+
+            <div class="search-container">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Ürün, kategori ara..." autocomplete="off">
+                    <button id="searchBtn" aria-label="Ara">🔍</button>
+                </div>
+                <div class="search-suggestions" id="searchSuggestions"></div>
+            </div>
+
+            <div class="header-actions">
+                <div class="action-item" onclick="showToast('Sipariş takip sistemi açılıyor...', 'info')">
+                    <span class="icon">📦</span>
+                    <span>Sipariş Takibi</span>
+                </div>
+                <div class="action-item account-item">
+                    <span class="icon">👤</span>
+                    <span>Üyelik</span>
+                    <div class="account-dropdown">
+                        <a href="#" onclick="showToast('Giriş ekranı açılıyor...', 'info'); return false;">🔑 Giriş Yap</a>
+                        <a href="#" onclick="showToast('Kayıt ekranı açılıyor...', 'info'); return false;">📝 Üye Ol</a>
+                        <a href="#" onclick="showToast('Siparişlerim yükleniyor...', 'info'); return false;">📋 Siparişlerim</a>
+                        <a href="#" onclick="showToast('Adres defteri açılıyor...', 'info'); return false;">📍 Adreslerim</a>
+                    </div>
+                </div>
+                <div class="action-item" id="favoriteBtn">
+                    <span class="icon">♥</span>
+                    <span class="badge" id="favCount">0</span>
+                </div>
+                <div class="action-item cart-btn" id="cartBtn">
+                    🛒 <span>Sepetim</span>
+                    <span class="badge" id="cartCount">0</span>
+                </div>
+            </div>
+        </div>
+
+        <nav class="text-nav" id="mainNav">
+            <a href="#" data-category="all" class="active">Tümü</a>
+            <a href="#" data-category="menekse">Menekşe Ailesi</a>
+            <a href="#" data-category="begonya">Begonyalar</a>
+            <a href="#" data-category="egzotik">Egzotik Çiçekler</a>
+            <a href="#" data-category="sukulent">Sukulent & Kaktüsler</a>
+            <a href="#" data-category="yaprak">Yaprak Bitkileri</a>
+        </nav>
+    </div>
+</header>
+
+<main class="container">
+
+    <!-- Yuvarlak Kategori -->
+    <section class="circle-menu" id="circleMenu">
+        <div class="circle-item" data-category="menekse">
+            <div class="circle-img" style="background: linear-gradient(135deg, #f3e5f5, #ce93d8);">🌸</div>
+            <span>Menekşe<br>Ailesi</span>
+        </div>
+        <div class="circle-item" data-category="begonya">
+            <div class="circle-img" style="background: linear-gradient(135deg, #fce4ec, #f48fb1);">🌹</div>
+            <span>Begonyalar</span>
+        </div>
+        <div class="circle-item" data-category="egzotik">
+            <div class="circle-img" style="background: linear-gradient(135deg, #fff3e0, #ffcc80);">🌺</div>
+            <span>Egzotik<br>Çiçekler</span>
+        </div>
+        <div class="circle-item" data-category="sukulent">
+            <div class="circle-img" style="background: linear-gradient(135deg, #e8f5e9, #a5d6a7);">🌵</div>
+            <span>Sukulent<br>& Kaktüs</span>
+        </div>
+        <div class="circle-item" data-category="yaprak">
+            <div class="circle-img" style="background: linear-gradient(135deg, #e0f2f1, #80cbc4);">🌿</div>
+            <span>Yaprak<br>Bitkileri</span>
+        </div>
+        <div class="circle-item" data-category="menekse">
+            <div class="circle-img" style="background: linear-gradient(135deg, #fce4ec, #f8bbd0);">💜</div>
+            <span>Streptocarpus</span>
+        </div>
+        <div class="circle-item" data-category="sukulent">
+            <div class="circle-img" style="background: linear-gradient(135deg, #fff8e1, #ffecb3);">🎄</div>
+            <span>Yılbaşı<br>Çiçeği</span>
+        </div>
+        <div class="circle-item" data-category="egzotik">
+            <div class="circle-img" style="background: linear-gradient(135deg, #e3f2fd, #90caf9);">🕯️</div>
+            <span>Hoya Mum<br>Çiçeği</span>
+        </div>
+        <div class="circle-item" data-category="yaprak">
+            <div class="circle-img" style="background: linear-gradient(135deg, #f1f8e9, #c5e1a5);">🍃</div>
+            <span>Fil Kulağı</span>
+        </div>
+    </section>
+
+    <!-- Banner Bölümü -->
+    <section class="banner-section">
+
+        <!-- Hero slider + sağ küçük banner -->
+        <div class="row-1">
+            <div class="hero-slider" id="heroSlider">
+                <div class="hero-slides" id="heroSlides">
+                    <div class="hero-slide" style="background: linear-gradient(180deg, rgba(252,228,236,0.85), rgba(244,143,177,0.85)), url('https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/Florada_da_Glox%C3%ADnia.jpg/500px-Florada_da_Glox%C3%ADnia.jpg'); background-size: cover; background-position: center;">
+                        <div class="banner-content hero-copy">
+                            <div class="banner-eyebrow">Bartın'da Taze Bitki ve Çiçek</div>
+                            <div class="banner-title" style="color: #c2185b;">MENEKŞE AİLESİ KOLEKSİYONU</div>
+                            <div class="banner-sub">Bardak Menekşesi, Streptocarpus ve Episkia çeşitleri</div>
+                            <div class="hero-buttons">
+                                <a href="#orderSection" class="hero-cta">WhatsApp ile Sipariş Ver</a>
+                                <a href="#productsGrid" class="hero-outline">Ürünleri İncele</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hero-slide" style="background: linear-gradient(180deg, rgba(248,187,208,0.88), rgba(240,98,146,0.82)), url('https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Gardenology.org-IMG_2097_rbgs11jan.jpg/500px-Gardenology.org-IMG_2097_rbgs11jan.jpg'); background-size: cover; background-position: center;">
+                        <div class="banner-content hero-copy">
+                            <div class="banner-eyebrow">Nadir Koleksiyon Fırsatları</div>
+                            <div class="banner-title" style="color: white;">NADİR BEGONYA TÜRLERİ</div>
+                            <div class="banner-sub" style="color: white;">Gül begonya, sarkık begonya ve gelin damat</div>
+                            <div class="hero-buttons">
+                                <a href="#orderSection" class="hero-cta">WhatsApp ile Sipariş Ver</a>
+                                <a href="#productsGrid" class="hero-outline">Koleksiyonu Gör</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hero-slide" style="background: linear-gradient(180deg, rgba(255,204,188,0.88), rgba(255,138,101,0.82)), url('https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/NKN-2007-06-13_114250_Hoya_Carnosa_%28Yvan_Leduc_author_for_Wikipedia%29.jpg/500px-NKN-2007-06-13_114250_Hoya_Carnosa_%28Yvan_Leduc_author_for_Wikipedia%29.jpg'); background-size: cover; background-position: center;">
+                        <div class="banner-content hero-copy">
+                            <div class="banner-eyebrow">Aynı Gün Hizmet</div>
+                            <div class="banner-title" style="color: white;">AYNI GÜN TESLİMAT</div>
+                            <div class="banner-sub" style="color: white;">12:00'ye kadar verilen siparişlerde aynı gün kapında</div>
+                            <div class="hero-buttons">
+                                <a href="#orderSection" class="hero-cta">WhatsApp ile Sipariş Ver</a>
+                                <a href="#productsGrid" class="hero-outline">Hemen İncele</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button class="hero-arrow prev" id="heroPrev">‹</button>
+                <button class="hero-arrow next" id="heroNext">›</button>
+                <div class="hero-dots" id="heroDots"></div>
+            </div>
+
+            <div class="banner has-bg" style="background: linear-gradient(180deg, rgba(248,187,208,0.8), rgba(244,143,177,0.9)), url('https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/NKN-2007-06-13_114250_Hoya_Carnosa_%28Yvan_Leduc_author_for_Wikipedia%29.jpg/500px-NKN-2007-06-13_114250_Hoya_Carnosa_%28Yvan_Leduc_author_for_Wikipedia%29.jpg'); background-size: cover; background-position: center;">
+                <div class="banner-content">
+                    <div class="banner-title" style="color: white;">EGZOTİK<br>ÇİÇEKLER</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3'lü satır -->
+        <div class="row-2">
+            <div class="banner has-bg" style="background: linear-gradient(180deg, rgba(243,229,245,0.85), rgba(206,147,216,0.9)), url('https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/Florada_da_Glox%C3%ADnia.jpg/500px-Florada_da_Glox%C3%ADnia.jpg'); background-size: cover; background-position: center;">
+                <div class="banner-content">
+                    <div class="banner-title" style="color: #ffffff;">MENEKŞE AİLESİ</div>
+                    <div class="banner-sub" style="color: #f7f0ff;">Bardak Menekşesi • Siningia • Kohleria</div>
+                </div>
+            </div>
+            <div class="banner has-bg" style="background: linear-gradient(180deg, rgba(252,228,236,0.9), rgba(244,143,177,0.92)), url('https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Gardenology.org-IMG_2097_rbgs11jan.jpg/500px-Gardenology.org-IMG_2097_rbgs11jan.jpg'); background-size: cover; background-position: center;">
+                <div class="banner-content">
+                    <div class="banner-title" style="color: #ffffff;">BEGONYALAR</div>
+                    <div class="banner-sub" style="color: #ffeafa;">Gül • Sarkık • Gelin Damat</div>
+                </div>
+            </div>
+            <div class="banner has-bg" style="background: linear-gradient(180deg, rgba(255,243,224,0.9), rgba(255,204,128,0.9)), url('https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Anthurium3.JPG/500px-Anthurium3.JPG'); background-size: cover; background-position: center;">
+                <div class="banner-content">
+                    <div class="banner-title" style="color: #ffffff;">EGZOTİK ÇİÇEKLER</div>
+                    <div class="banner-sub" style="color: #fff5e4;">Küpeli • Hoya • Gala</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2'li satır -->
+        <div class="row-3">
+            <div class="banner has-bg" style="background: linear-gradient(180deg, rgba(232,245,233,0.9), rgba(165,214,167,0.9)), url('https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Cactus_de_no%C3%ABl_rev.jpg/500px-Cactus_de_no%C3%ABl_rev.jpg'); background-size: cover; background-position: center;">
+                <div class="banner-content">
+                    <div class="banner-title" style="color: #ffffff;">SUKULENT & KAKTÜSLER</div>
+                    <div class="banner-sub" style="color: #f1f9f0;">Yılbaşı, Pascalya, Kalanchoe ve daha fazlası</div>
+                </div>
+            </div>
+            <div class="banner has-bg" style="background: linear-gradient(180deg, rgba(224,242,241,0.9), rgba(128,203,196,0.9)), url('https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Alocasia_macrorrhiza_-_Val_Rahmeh_-_DSC04449.JPG/500px-Alocasia_macrorrhiza_-_Val_Rahmeh_-_DSC04449.JPG'); background-size: cover; background-position: center;">
+                <div class="banner-content">
+                    <div class="banner-title" style="color: #ffffff;">YAPRAK BİTKİLERİ</div>
+                    <div class="banner-sub" style="color: #eef8f7;">Fil Kulağı • Kauçuk • Dua Çiçeği</div>
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+    <!-- Ürün Başlığı -->
+    <div class="section-header">
+        <h2 id="sectionTitle">Çok Satan Çiçekler</h2>
+        <div class="sort-filter">
+            <select id="sortSelect">
+                <option value="default">Önerilen Sıralama</option>
+                <option value="price-asc">Fiyat: Düşükten Yükseğe</option>
+                <option value="price-desc">Fiyat: Yüksekten Düşüğe</option>
+                <option value="rating">En Yüksek Puan</option>
+                <option value="newest">En Yeniler</option>
+            </select>
+            <button id="clearFilters" style="display:none;">Filtreleri Temizle</button>
+        </div>
+    </div>
+
+    <!-- Ürün Listesi -->
+    <section class="products-grid" id="productsGrid"></section>
+
+    <div class="load-more-wrap">
+        <button class="load-more" id="loadMoreBtn">Daha Fazla Göster</button>
+    </div>
+
+    <!-- Newsletter -->
+    <section class="newsletter">
+        <div class="newsletter-text">
+            <h3>🌸 Kampanyalardan Haberdar Ol</h3>
+            <p>İlk siparişine özel %15 indirim kuponu için e-postanı bırak!</p>
+        </div>
+        <form class="newsletter-form" id="newsletterForm">
+            <input type="email" placeholder="E-posta adresin" required id="newsletterEmail">
+            <button type="submit">Abone Ol</button>
+        </form>
+    </section>
+
+    <!-- WhatsApp Sipariş Bölümü -->
+    <section class="checkout-section" id="orderSection">
+        <h2>WhatsApp ile Siparişinizi Tamamlayın</h2>
+        <div class="order-grid">
+            <div class="order-card">
+                <h3>Sipariş Özeti</h3>
+                <div id="orderSummary"></div>
+                <div class="order-total">
+                    <span>Toplam</span>
+                    <strong id="orderTotal">0,00 TL</strong>
+                </div>
+                <p class="order-note">Bu site üzerinden ödeme alınmaz. Siparişinizi WhatsApp üzerinden tamamlayacağız ve teslimat detaylarını orada netleştireceğiz.</p>
+            </div>
+            <div class="order-card">
+                <h3>Bilgilerinizi Girin</h3>
+                <form class="order-form" id="orderForm">
+                    <label>Ad Soyad
+                        <input type="text" id="orderName" placeholder="Adınız ve soyadınız" required>
+                    </label>
+                    <label>Telefon
+                        <input type="tel" id="orderPhone" placeholder="0553 345 30 40" required>
+                    </label>
+                    <label>Teslimat Adresi
+                        <textarea id="orderAddress" placeholder="Teslimat adresinizi girin" required></textarea>
+                    </label>
+                    <label>Sipariş Notu <span class="optional">(Opsiyonel)</span>
+                        <textarea id="orderNote" placeholder="Hediye notu veya özel talep"></textarea>
+                    </label>
+                    <button type="button" class="checkout-btn" id="whatsappOrderBtn">WhatsApp ile Sipariş Gönder</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- İletişim Bölümü -->
+    <section class="contact-section">
+        <div class="contact-card">
+            <h2>WhatsApp Üzerinden Hızlı Destek</h2>
+            <p>Siparişinizi WhatsApp üzerinden gönderebilirsiniz. Ürün listesini ve iletişim bilgilerinizi bize iletin, teslimat ve ödeme detaylarını orada konuşalım.</p>
+            <a href="https://wa.me/905533453040?text=Merhaba%20Ayy%C4%B1ld%C4%B1z%20%C3%87i%C3%A7ek%C3%A7ilik,%20sipari%C5%9F%20vermek%20istiyorum." target="_blank" class="whatsapp-button">WhatsApp'tan Hemen Yaz</a>
+        </div>
+        <div class="contact-card">
+            <h3>İletişim Bilgileri</h3>
+            <ul class="contact-info-list">
+                <li><span>📱</span><div><strong>WhatsApp</strong><br><a href="https://wa.me/905533453040" target="_blank">0553 345 30 40</a></div></li>
+                <li><span>☎️</span><div><strong>Sabit Telefon</strong><br>0378 228 54 65</div></li>
+                <li><span>✉️</span><div><strong>E-posta</strong><br><a href="mailto:ayyildizsongul50@gmail.com">ayyildizsongul50@gmail.com</a></div></li>
+                <li><span>📍</span><div><strong>Adres</strong><br>Bartın / Merkez, Orduyeri Mahallesi</div></li>
+                <li><span>🕒</span><div><strong>Çalışma Saatleri</strong><br>Pzt-Cmt: 09:00 - 20:00<br>Pazar: Kapalı</div></li>
+            </ul>
+        </div>
+    </section>
+
+</main>
+
+<!-- Sepet Sidebar -->
+<aside class="sidebar" id="cartSidebar">
+    <div class="sidebar-header">
+        <h3>🛒 Sepetim (<span id="cartItemCount">0</span>)</h3>
+        <button class="sidebar-close" data-close="cart">✕</button>
+    </div>
+    <div class="sidebar-body" id="cartBody">
+        <div class="empty-state">
+            <div class="icon">🛒</div>
+            <p>Sepetinde henüz ürün yok</p>
+            <button data-close="cart">Alışverişe Başla</button>
+        </div>
+    </div>
+    <div class="sidebar-footer" id="cartFooter" style="display:none;">
+        <div class="cart-summary">
+            <div class="cart-summary-row">
+                <span>Ara Toplam:</span>
+                <span id="subtotal">0,00 TL</span>
+            </div>
+            <div class="cart-summary-row">
+                <span>Kargo:</span>
+                <span id="shipping" style="color:#2e7d32;font-weight:600;">Ücretsiz</span>
+            </div>
+            <div class="cart-summary-row total">
+                <span>Toplam:</span>
+                <span class="total-amount" id="cartTotal">0,00 TL</span>
+            </div>
+        </div>
+        <button class="checkout-btn" id="checkoutBtn">WhatsApp ile Siparişi Tamamla →</button>
+    </div>
+</aside>
+
+<!-- Favoriler Sidebar -->
+<aside class="sidebar" id="favoritesSidebar">
+    <div class="sidebar-header">
+        <h3>♥ Favorilerim (<span id="favItemCount">0</span>)</h3>
+        <button class="sidebar-close" data-close="favorites">✕</button>
+    </div>
+    <div class="sidebar-body" id="favoritesBody">
+        <div class="empty-state">
+            <div class="icon">♡</div>
+            <p>Henüz favori ürünün yok</p>
+            <button data-close="favorites">Ürünleri Keşfet</button>
+        </div>
+    </div>
+</aside>
+
+<!-- Quick View Modal -->
+<div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+        <div class="modal-img" id="modalImg">🌸
+            <button class="modal-close" id="modalClose">✕</button>
+        </div>
+        <div class="modal-content">
+            <div class="shipping-badge">🚚 Aynı Gün Ücretsiz Teslimat</div>
+            <div class="product-title" id="modalTitle"></div>
+            <div class="rating">
+                <span class="stars" id="modalStars"></span>
+                <span id="modalRatingCount"></span>
+            </div>
+            <div class="price-row">
+                <span class="old-price" id="modalOldPrice"></span>
+                <div class="price">
+                    <span id="modalPrice"></span>
+                    <span class="discount-tag" id="modalDiscount"></span>
+                </div>
+            </div>
+            <p class="modal-desc" id="modalDesc"></p>
+            <ul class="modal-features">
+                <li>Aynı gün ücretsiz teslimat</li>
+                <li>Taze çiçek garantisi</li>
+                <li>Özel kart ile hediye seçeneği</li>
+                <li>24 saat müşteri desteği</li>
+            </ul>
+            <div class="modal-actions">
+                <button class="fav-btn" id="modalFavBtn">♡</button>
+                <button class="add-to-cart" id="modalAddBtn">🛒 Sepete Ekle</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Overlay -->
+<div class="overlay" id="overlay"></div>
+
+<!-- Toast container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- Yüzen WhatsApp Butonu -->
+<a href="https://wa.me/905533453040?text=Merhaba,%20Ayy%C4%B1ld%C4%B1z%20%C3%87i%C3%A7ek%C3%A7ilik%20web%20sitenizden%20yaz%C4%B1yorum." target="_blank" class="whatsapp-float" title="WhatsApp ile iletişim">
+    <span>💬</span>
+    <span class="whatsapp-tooltip">WhatsApp'tan yazın!</span>
+</a>
+
+<!-- Bilgi Modal (Hakkımızda / İade / Teslimat vb.) -->
+<div class="info-modal-overlay" id="infoModalOverlay">
+    <div class="info-modal">
+        <div class="info-modal-header">
+            <h2 id="infoModalTitle">🌸 Hakkımızda</h2>
+            <button class="info-modal-close" id="infoModalClose">✕</button>
+        </div>
+        <div class="info-modal-body" id="infoModalBody"></div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-col footer-brand">
+                <a href="#" class="logo">Ayyıldız Çiçekçilik</a>
+                <p style="line-height:1.7;">Bartın Orduyeri'nde, nadir menekşe türlerinden begonyalara, sukulentlerden iç mekan bitkilerine zengin koleksiyonumuzla sevdiklerinize aynı gün teslimat yapıyoruz.</p>
+                <div class="social-icons">
+                    <a href="https://wa.me/905533453040" target="_blank" title="WhatsApp">💬</a>
+                    <a href="mailto:ayyildizsongul50@gmail.com" title="E-posta">✉️</a>
+                    <a href="#" title="Instagram" onclick="showToast('Instagram sayfamız yakında!','info');return false;">📷</a>
+                    <a href="#" title="Facebook" onclick="showToast('Facebook sayfamız yakında!','info');return false;">📘</a>
+                </div>
+            </div>
+            <div class="footer-col">
+                <h4>Kurumsal</h4>
+                <a href="#" data-info="about">Hakkımızda</a>
+                <a href="#" data-info="contact">İletişim</a>
+                <a href="https://wa.me/905533453040" target="_blank">WhatsApp ile İletişim</a>
+                <a href="mailto:ayyildizsongul50@gmail.com">E-posta Gönder</a>
+            </div>
+            <div class="footer-col">
+                <h4>Yardım</h4>
+                <a href="#" data-info="delivery">Teslimat Bilgileri</a>
+                <a href="#" data-info="returns">İade ve Değişim</a>
+                <a href="#" data-info="faq">Sıkça Sorulan Sorular</a>
+                <a href="#" data-info="privacy">Gizlilik Sözleşmesi</a>
+                <a href="#" data-info="care">Bitki Bakım Rehberi</a>
+            </div>
+            <div class="footer-col">
+                <h4>İletişim</h4>
+                <p>📱 <a href="https://wa.me/905533453040" target="_blank" style="color:#25d366;font-weight:600;">0553 345 30 40</a></p>
+                <p>☎️ 0378 228 54 65</p>
+                <p>✉️ <a href="mailto:ayyildizsongul50@gmail.com">ayyildizsongul50@gmail.com</a></p>
+                <p>📍 Bartın / Merkez<br>&nbsp;&nbsp;&nbsp;&nbsp;Orduyeri Mahallesi</p>
+                <p>🕒 Pzt-Cmt: 09:00 - 20:00<br>&nbsp;&nbsp;&nbsp;&nbsp;Pazar: Kapalı</p>
+                <h4 style="margin-top:20px;">Ödeme Yöntemleri</h4>
+                <div class="payment-icons">
+                    <span>VISA</span><span>MC</span><span>TROY</span><span>HAVALE</span><span>KAPIDA</span>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            © 2026 Ayyıldız Çiçekçilik — Bartın. Tüm hakları saklıdır. | Bartın'da gerçek bitki dostlarınızın adresi 🌸
+        </div>
+    </div>
+</footer>
+
+<script>
+/* ============ VERİ ============ */
+const PRODUCTS = [
+    // --- MENEKŞE AİLESİ (Gesneriaceae) ---
+    { id: 1, title: "Gloksinya - Bardak Menekşesi", price: 150.00, oldPrice: null, rating: 5, reviews: 124, category: "menekse", emoji: "🌸", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/Florada_da_Glox%C3%ADnia.jpg/500px-Florada_da_Glox%C3%ADnia.jpg", desc: "Kadife yapraklı, gösterişli çan şeklinde mor, pembe, kırmızı renklerde çiçek açan ev bitkisi. Bakımı kolay, uzun ömürlü.", isNew: false, bestseller: true },
+    { id: 2, title: "Episkia - Renkli Yapraklı Sürünücü", price: 350.00, oldPrice: null, rating: 4, reviews: 67, category: "menekse", emoji: "🍃", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Episcia_reptans1.jpg/500px-Episcia_reptans1.jpg", desc: "Bakır, gümüş ve yeşil tonlardaki muhteşem yaprakları ve turuncu çiçekleriyle dikkat çeken sürünücü bitki.", isNew: true, bestseller: false },
+    { id: 3, title: "Streptocarpus - Cape Çuha Çiçeği", price: 200.00, oldPrice: null, rating: 5, reviews: 89, category: "menekse", emoji: "💜", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/2007-03-20Streptocarpus03.jpg/500px-2007-03-20Streptocarpus03.jpg", desc: "Şelale gibi sarkan uzun saplarında mor, pembe ve beyaz çiçekler açan zarif Afrika kökenli bitki.", isNew: false, bestseller: true },
+    { id: 4, title: "Siningia - Mini Bardak Menekşesi", price: 250.00, oldPrice: null, rating: 4, reviews: 52, category: "menekse", emoji: "🌺", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Sinningia_speciosa-IMG_0661.JPG/500px-Sinningia_speciosa-IMG_0661.JPG", desc: "Bardak Menekşesi akrabası, kompakt formu ve canlı renkleriyle masaüstü için ideal nadir bir tür.", isNew: true, bestseller: false },
+    { id: 5, title: "Özel Tür Afrika Menekşesi", price: 150.00, oldPrice: null, rating: 5, reviews: 203, category: "menekse", emoji: "🌸", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Saintpaulia_ionantha.jpg/500px-Saintpaulia_ionantha.jpg", desc: "Koleksiyoner severlerin tercihi, nadir bulunan özel tür Afrika menekşesi. Yıl boyu çiçek açar.", isNew: false, bestseller: true },
+    { id: 6, title: "Kohleria - Tüylü Çan Çiçeği", price: 250.00, oldPrice: null, rating: 4, reviews: 41, category: "menekse", emoji: "🔔", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Gesneriaceae_-_Kohleria_amabilis_var._bogotensis.JPG/500px-Gesneriaceae_-_Kohleria_amabilis_var._bogotensis.JPG", desc: "Kadife tüylü yaprakları ve benekli çan şeklinde çiçekleriyle eşsiz görünümlü egzotik tür.", isNew: true, bestseller: false },
+    { id: 7, title: "Smithiantha - Tapınak Çanları", price: 250.00, oldPrice: null, rating: 5, reviews: 36, category: "menekse", emoji: "🌷", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/Temple_Bells_%28Smithiantha_cinnabarina%29_%283104111584%29.jpg/500px-Temple_Bells_%28Smithiantha_cinnabarina%29_%283104111584%29.jpg", desc: "Kadifemsi tüylü kahverengi-yeşil yaprakları ve turuncu-sarı borazan çiçekleriyle nadir tür.", isNew: false, bestseller: false },
+
+    // --- BEGONYALAR ---
+    { id: 8, title: "Gelin Damat Begonya", price: 700.00, oldPrice: null, rating: 5, reviews: 156, category: "begonya", emoji: "💑", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Gardenology.org-IMG_2097_rbgs11jan.jpg/500px-Gardenology.org-IMG_2097_rbgs11jan.jpg", desc: "Pembe ve beyaz çiçeklerinin uyumuyla gelin-damat görünümlü, düğün ve özel günler için ideal.", isNew: false, bestseller: true },
+    { id: 9, title: "Rex Begonya", price: 350.00, oldPrice: null, rating: 4, reviews: 98, category: "begonya", emoji: "🌹", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Begonia_obliqua00.jpg/500px-Begonia_obliqua00.jpg", desc: "Klasik begonya türü, her ortama uyum sağlayan şık ve bakımı kolay iç mekan bitkisi.", isNew: false, bestseller: false },
+    { id: 10, title: "Gül Begonya - Katmerli Çiçek", price: 459.99, oldPrice: 549.99, rating: 5, reviews: 134, category: "begonya", emoji: "🌷", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Begonia-tuberhybride_Red.jpg/500px-Begonia-tuberhybride_Red.jpg", desc: "Gül benzeri katmerli muhteşem çiçekleriyle dikkat çeken, koleksiyonluk begonya türü.", isNew: true, bestseller: true },
+    { id: 11, title: "Sarkık Begonya - Asılı Saksı", price: 600.00, oldPrice: null, rating: 4, reviews: 72, category: "begonya", emoji: "🌿", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/Begonia_boliviensis_A.DC._5.jpg/500px-Begonia_boliviensis_A.DC._5.jpg", desc: "Asılı saksılarda sarkan dallarıyla görsel şölen sunan, balkon ve teras için ideal tür.", isNew: false, bestseller: false },
+
+    // --- EGZOTİK ÇİÇEKLER ---
+    { id: 12, title: "Küpeli (Fuchsia) - Dans Eden Balerin", price: 200.00, oldPrice: null, rating: 5, reviews: 187, category: "egzotik", emoji: "💎", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Brincos_De_Princesa.jpg/500px-Brincos_De_Princesa.jpg", desc: "Küpe şeklinde sarkık çiçekleriyle dans eden balerinleri andıran, romantik bir egzotik tür.", isNew: false, bestseller: true },
+    { id: 13, title: "Hoya Mum Çiçeği - Porselen Çiçek", price: 350.00, oldPrice: null, rating: 5, reviews: 245, category: "egzotik", emoji: "🕯️", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/NKN-2007-06-13_114250_Hoya_Carnosa_%28Yvan_Leduc_author_for_Wikipedia%29.jpg/500px-NKN-2007-06-13_114250_Hoya_Carnosa_%28Yvan_Leduc_author_for_Wikipedia%29.jpg", desc: "Mum gibi parlayan, balmumsu kokulu çiçekleri olan tırmanıcı sarmaşık. Uzun ömürlü.", isNew: false, bestseller: true },
+    { id: 14, title: "Gala Çiçeği", price: 600.00, oldPrice: null, rating: 4, reviews: 58, category: "egzotik", emoji: "🌺", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Anthurium3.JPG/500px-Anthurium3.JPG", desc: "Egzotik görünümlü, parlak ve dikkat çekici çiçekleriyle her ortama hareket katan özel tür.", isNew: true, bestseller: false },
+
+    // --- SUKULENT & KAKTÜSLER ---
+    { id: 15, title: "Yılbaşı Çiçeği (Schlumbergera)", price: 200.00, oldPrice: null, rating: 5, reviews: 312, category: "sukulent", emoji: "🎄", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Cactus_de_no%C3%ABl_rev.jpg/500px-Cactus_de_no%C3%ABl_rev.jpg", desc: "Aralık-Ocak aylarında pembe-kırmızı çiçek açan, yılbaşının vazgeçilmez kaktüs türü.", isNew: false, bestseller: true },
+    { id: 16, title: "Pascalya Çiçeği - Paskalya Kaktüsü", price: 200.00, oldPrice: null, rating: 4, reviews: 86, category: "sukulent", emoji: "🌷", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/Hatiora_gaertneri.jpg/500px-Hatiora_gaertneri.jpg", desc: "Paskalya döneminde rengarenk açan, yılbaşı çiçeğinin akrabası dayanıklı kaktüs.", isNew: true, bestseller: false },
+    { id: 17, title: "Kalanchoe - Rengarenk Sukulent", price: 200.00, oldPrice: null, rating: 5, reviews: 428, category: "sukulent", emoji: "🌼", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Kalanchoe.blossfeldiana.jpg/500px-Kalanchoe.blossfeldiana.jpg", desc: "Uzun ömürlü, bakımı çok kolay, sarı-turuncu-kırmızı-pembe çiçekleriyle rengarenk sukulent.", isNew: false, bestseller: true },
+    { id: 18, title: "Dikenler Tacı", price: 500.00, oldPrice: null, rating: 4, reviews: 94, category: "sukulent", emoji: "👑", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Euphorbia_Milii_flowers.jpg/500px-Euphorbia_Milii_flowers.jpg", desc: "Dikenli gövdesi ve küçük pembe-kırmızı çiçekleriyle dayanıklı, az su isteyen sukulent.", isNew: false, bestseller: false },
+
+    // --- YAPRAK BİTKİLERİ ---
+    { id: 19, title: "Fil Kulağı (Alocasia) - Dev Yapraklar", price: 250.00, oldPrice: null, rating: 5, reviews: 267, category: "yaprak", emoji: "🍃", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Alocasia_macrorrhiza_-_Val_Rahmeh_-_DSC04449.JPG/500px-Alocasia_macrorrhiza_-_Val_Rahmeh_-_DSC04449.JPG", desc: "Devasa kalp şeklinde damarlı yapraklarıyla tropik atmosfer yaratan dekoratif iç mekan bitkisi.", isNew: false, bestseller: true },
+    { id: 20, title: "Kauçuk Çiçeği", price: 400.00, oldPrice: null, rating: 5, reviews: 198, category: "yaprak", emoji: "🌿", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/Ficus_elastica_leaves_02.JPG/500px-Ficus_elastica_leaves_02.JPG", desc: "Parlak büyük yapraklı, hava temizleyen, ev ve ofis dekorasyonunun yıldızı klasik bitki.", isNew: false, bestseller: true },
+    { id: 21, title: "Dua Çiçeği (Maranta) - Hareketli Yapraklar", price: 300.00, oldPrice: null, rating: 4, reviews: 142, category: "yaprak", emoji: "🙏", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Maranta_leuconeura3.jpg/500px-Maranta_leuconeura3.jpg", desc: "Geceleri yapraklarını birleştirerek dua eder gibi kapanan, eşsiz desenli muhteşem bitki.", isNew: true, bestseller: false }
+];
+
+/* ============ STATE ============ */
+let cart = JSON.parse(localStorage.getItem('ayyildiz_cart') || '[]');
+let favorites = JSON.parse(localStorage.getItem('ayyildiz_favorites') || '[]');
+const WHATSAPP_NUMBER = '905533453040';
+let displayedCount = 10;
+let currentCategory = 'all';
+let currentSort = 'default';
+let currentSearch = '';
+
+/* ============ YARDIMCILAR ============ */
+const $ = (s) => document.querySelector(s);
+const $$ = (s) => document.querySelectorAll(s);
+const formatPrice = (p) => p.toLocaleString('tr-TR', { minimumFractionDigits: 2 }) + ' TL';
+const saveCart = () => localStorage.setItem('ayyildiz_cart', JSON.stringify(cart));
+const saveFav = () => localStorage.setItem('ayyildiz_favorites', JSON.stringify(favorites));
+
+function showToast(message, type = 'success') {
+    const icons = { success: '✓', error: '✕', info: 'ℹ' };
+    const toast = document.createElement('div');
+    toast.className = 'toast ' + type;
+    toast.innerHTML = `<span class="icon">${icons[type]}</span><span>${message}</span>`;
+    $('#toastContainer').appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+}
+
+function getStars(rating) {
+    return '★'.repeat(rating) + '☆'.repeat(5 - rating);
+}
+
+function getDiscount(price, oldPrice) {
+    if (!oldPrice) return null;
+    return Math.round(((oldPrice - price) / oldPrice) * 100);
+}
+
+/* ============ ÜRÜN RENDER ============ */
+function getFilteredProducts() {
+    let list = [...PRODUCTS];
+    if (currentCategory !== 'all') {
+        list = list.filter(p => p.category === currentCategory);
+    }
+    if (currentSearch) {
+        const q = currentSearch.toLowerCase();
+        list = list.filter(p => p.title.toLowerCase().includes(q) || p.category.toLowerCase().includes(q));
+    }
+    switch (currentSort) {
+        case 'price-asc': list.sort((a,b) => a.price - b.price); break;
+        case 'price-desc': list.sort((a,b) => b.price - a.price); break;
+        case 'rating': list.sort((a,b) => b.rating * b.reviews - a.rating * a.reviews); break;
+        case 'newest': list.sort((a,b) => (b.isNew?1:0) - (a.isNew?1:0)); break;
+    }
+    return list;
+}
+
+function renderProducts() {
+    const list = getFilteredProducts();
+    const grid = $('#productsGrid');
+    const visible = list.slice(0, displayedCount);
+
+    if (visible.length === 0) {
+        grid.innerHTML = '<div class="no-results">🔍 Aradığın kriterlere uygun ürün bulunamadı.</div>';
+        $('#loadMoreBtn').style.display = 'none';
+        return;
+    }
+
+    grid.innerHTML = visible.map(p => {
+        const discount = getDiscount(p.price, p.oldPrice);
+        const isFav = favorites.includes(p.id);
+        return `
+            <div class="product-card" data-id="${p.id}">
+                <div class="product-badges">
+                    ${p.isNew ? '<span class="badge-pill new">YENİ</span>' : ''}
+                    ${p.bestseller ? '<span class="badge-pill bestseller">ÇOK SATAN</span>' : ''}
+                    ${discount ? `<span class="badge-pill">%${discount} İNDİRİM</span>` : ''}
+                </div>
+                <button class="fav-btn ${isFav?'active':''}" data-fav="${p.id}">${isFav?'♥':'♡'}</button>
+                <div class="product-img">
+                    <img src="${p.img}" alt="${p.title}" loading="lazy" onerror="this.style.display='none';this.parentElement.style.fontSize='80px';this.parentElement.innerHTML+='${p.emoji}';">
+                    <button class="quick-view" data-quick="${p.id}">👁 Hızlı Bak</button>
+                </div>
+                <div class="shipping-badge">🚚 Aynı Gün Ücretsiz Teslimat</div>
+                <div class="product-title">${p.title}</div>
+                <div class="rating">
+                    <span class="stars">${getStars(p.rating)}</span> (${p.reviews})
+                </div>
+                <div class="price-row">
+                    ${p.oldPrice ? `<span class="old-price">${formatPrice(p.oldPrice)}</span>` : ''}
+                    <div class="price">${formatPrice(p.price)} ${discount?`<span class="discount-tag">%${discount}</span>`:''}</div>
+                </div>
+                <button class="add-to-cart" data-add="${p.id}">🛒 Sepete Ekle</button>
+            </div>
+        `;
+    }).join('');
+
+    $('#loadMoreBtn').style.display = list.length > displayedCount ? 'inline-block' : 'none';
+    $('#loadMoreBtn').textContent = `Daha Fazla Göster (${list.length - displayedCount})`;
+}
+
+/* ============ SEPET ============ */
+function addToCart(id, qty = 1) {
+    const product = PRODUCTS.find(p => p.id === id);
+    if (!product) return;
+    const existing = cart.find(c => c.id === id);
+    if (existing) {
+        existing.qty += qty;
+    } else {
+        cart.push({ id, qty });
+    }
+    saveCart();
+    updateCartUI();
+    showToast(`${product.title.slice(0, 30)}... sepete eklendi`);
+    // sepet ikonuna kısa pulse
+    $('#cartBtn').animate([{transform:'scale(1)'},{transform:'scale(1.15)'},{transform:'scale(1)'}], {duration:300});
+}
+
+function removeFromCart(id) {
+    cart = cart.filter(c => c.id !== id);
+    saveCart();
+    updateCartUI();
+    showToast('Ürün sepetten çıkarıldı', 'info');
+}
+
+function changeQty(id, delta) {
+    const item = cart.find(c => c.id === id);
+    if (!item) return;
+    item.qty += delta;
+    if (item.qty <= 0) {
+        removeFromCart(id);
+        return;
+    }
+    saveCart();
+    updateCartUI();
+}
+
+function updateCartUI() {
+    const count = cart.reduce((s, c) => s + c.qty, 0);
+    $('#cartCount').textContent = count;
+    $('#cartItemCount').textContent = count;
+
+    if (cart.length === 0) {
+        $('#cartBody').innerHTML = `
+            <div class="empty-state">
+                <div class="icon">🛒</div>
+                <p>Sepetinde henüz ürün yok</p>
+                <button data-close="cart">Alışverişe Başla</button>
+            </div>`;
+        $('#cartFooter').style.display = 'none';
+        updateOrderSection();
+        return;
+    }
+
+    $('#cartBody').innerHTML = cart.map(c => {
+        const p = PRODUCTS.find(x => x.id === c.id);
+        return `
+            <div class="cart-item">
+                <div class="cart-item-img"><img src="${p.img}" alt="${p.title}" onerror="this.parentElement.innerHTML='${p.emoji}';"></div>
+                <div class="cart-item-info">
+                    <h4>${p.title}</h4>
+                    <div class="price">${formatPrice(p.price * c.qty)}</div>
+                    <div class="qty-control">
+                        <button data-qty="-" data-id="${c.id}">−</button>
+                        <span>${c.qty}</span>
+                        <button data-qty="+" data-id="${c.id}">+</button>
+                    </div>
+                </div>
+                <button class="remove-item" data-remove="${c.id}">🗑</button>
+            </div>`;
+    }).join('');
+
+    const subtotal = cart.reduce((s,c) => s + PRODUCTS.find(x=>x.id===c.id).price * c.qty, 0);
+    $('#subtotal').textContent = formatPrice(subtotal);
+    $('#cartTotal').textContent = formatPrice(subtotal);
+    $('#cartFooter').style.display = 'block';
+    updateOrderSection();
+}
+
+function getOrderTotal() {
+    return cart.reduce((s,c) => s + PRODUCTS.find(x => x.id === c.id).price * c.qty, 0);
+}
+
+function updateOrderSection() {
+    const summaryEl = $('#orderSummary');
+    if (!summaryEl) return;
+    const whatsappBtn = $('#whatsappOrderBtn');
+    const total = getOrderTotal();
+    $('#orderTotal').textContent = formatPrice(total);
+
+    if (cart.length === 0) {
+        summaryEl.innerHTML = `<div class="empty-state" style="padding:24px 0;">
+            <div class="icon">🛒</div>
+            <p>Sepetinizde ürün yok. Önce ürün ekleyip WhatsApp siparişi gönderebilirsiniz.</p>
+        </div>`;
+        if (whatsappBtn) whatsappBtn.disabled = true;
+        return;
+    }
+
+    summaryEl.innerHTML = cart.map(c => {
+        const p = PRODUCTS.find(x => x.id === c.id);
+        return `<div class="order-summary-item">
+            <span>${p.title} x${c.qty}</span>
+            <strong>${formatPrice(p.price * c.qty)}</strong>
+        </div>`;
+    }).join('') + `<div class="order-total">
+            <span>Toplam</span><strong>${formatPrice(total)}</strong>
+        </div>`;
+    if (whatsappBtn) whatsappBtn.disabled = false;
+}
+
+function buildWhatsAppOrderText(name, phone, address, note) {
+    const total = getOrderTotal();
+    let message = `Merhaba Ayyıldız Çiçekçilik,\n\n`;
+    message += `Aşağıdaki ürünleri sipariş etmek istiyorum:\n`;
+    cart.forEach(c => {
+        const p = PRODUCTS.find(x => x.id === c.id);
+        message += `- ${p.title} x${c.qty} (${formatPrice(p.price)})\n`;
+    });
+    message += `\nToplam: ${formatPrice(total)}\n\n`;
+    message += `Ad Soyad: ${name}\n`;
+    message += `Telefon: ${phone}\n`;
+    message += `Adres: ${address}\n`;
+    if (note) message += `\nNot: ${note}\n`;
+    message += `\nSiparişi WhatsApp üzerinden tamamlamak istiyorum.`;
+    return message;
+}
+
+function sendWhatsAppOrder() {
+    if (cart.length === 0) {
+        showToast('Sepetiniz boş. Önce ürün ekleyin.', 'error');
+        return;
+    }
+    const name = $('#orderName').value.trim();
+    const phone = $('#orderPhone').value.trim();
+    const address = $('#orderAddress').value.trim();
+    const note = $('#orderNote').value.trim();
+
+    if (!name || !phone || !address) {
+        showToast('Lütfen ad, telefon ve adres bilgilerini doldurun.', 'error');
+        return;
+    }
+
+    const text = buildWhatsAppOrderText(name, phone, address, note);
+    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
+    window.open(url, '_blank');
+    showToast('WhatsApp sipariş penceresi açıldı.', 'success');
+}
+
+
+/* ============ FAVORİLER ============ */
+function toggleFavorite(id) {
+    const idx = favorites.indexOf(id);
+    if (idx > -1) {
+        favorites.splice(idx, 1);
+        showToast('Favorilerden çıkarıldı', 'info');
+    } else {
+        favorites.push(id);
+        showToast('Favorilere eklendi ♥');
+    }
+    saveFav();
+    updateFavUI();
+    renderProducts(); // butonları güncelle
+}
+
+function updateFavUI() {
+    $('#favCount').textContent = favorites.length;
+    $('#favItemCount').textContent = favorites.length;
+
+    if (favorites.length === 0) {
+        $('#favoritesBody').innerHTML = `
+            <div class="empty-state">
+                <div class="icon">♡</div>
+                <p>Henüz favori ürünün yok</p>
+                <button data-close="favorites">Ürünleri Keşfet</button>
+            </div>`;
+        return;
+    }
+
+    $('#favoritesBody').innerHTML = favorites.map(id => {
+        const p = PRODUCTS.find(x => x.id === id);
+        return `
+            <div class="fav-item">
+                <div class="fav-item-img"><img src="${p.img}" alt="${p.title}" onerror="this.parentElement.innerHTML='${p.emoji}';"></div>
+                <div class="fav-item-info">
+                    <h4>${p.title}</h4>
+                    <div class="price">${formatPrice(p.price)}</div>
+                    <button class="add-to-cart" style="margin-top:6px;padding:6px 10px;font-size:12px;" data-add="${p.id}">🛒 Sepete Ekle</button>
+                </div>
+                <button class="remove-item" data-unfav="${p.id}">✕</button>
+            </div>`;
+    }).join('');
+}
+
+/* ============ MODAL (QUICK VIEW) ============ */
+let modalProductId = null;
+function openQuickView(id) {
+    const p = PRODUCTS.find(x => x.id === id);
+    if (!p) return;
+    modalProductId = id;
+    const modalImgEl = $('#modalImg');
+    const closeBtn = modalImgEl.querySelector('.modal-close');
+    modalImgEl.innerHTML = '';
+    const imgTag = document.createElement('img');
+    imgTag.src = p.img;
+    imgTag.alt = p.title;
+    imgTag.onerror = function() {
+        modalImgEl.innerHTML = p.emoji;
+        modalImgEl.style.fontSize = '140px';
+        modalImgEl.style.display = 'flex';
+        modalImgEl.style.alignItems = 'center';
+        modalImgEl.style.justifyContent = 'center';
+        modalImgEl.appendChild(closeBtn);
+    };
+    modalImgEl.appendChild(imgTag);
+    modalImgEl.appendChild(closeBtn);
+    $('#modalTitle').textContent = p.title;
+    $('#modalStars').textContent = getStars(p.rating);
+    $('#modalRatingCount').textContent = `(${p.reviews} değerlendirme)`;
+    $('#modalPrice').textContent = formatPrice(p.price);
+    $('#modalDesc').textContent = p.desc;
+
+    const oldEl = $('#modalOldPrice');
+    const discEl = $('#modalDiscount');
+    if (p.oldPrice) {
+        oldEl.textContent = formatPrice(p.oldPrice);
+        oldEl.style.display = 'inline';
+        const d = getDiscount(p.price, p.oldPrice);
+        discEl.textContent = `%${d}`;
+        discEl.style.display = 'inline';
+    } else {
+        oldEl.style.display = 'none';
+        discEl.style.display = 'none';
+    }
+
+    const isFav = favorites.includes(id);
+    $('#modalFavBtn').textContent = isFav ? '♥' : '♡';
+    $('#modalFavBtn').classList.toggle('active', isFav);
+
+    $('#modalOverlay').classList.add('active');
+}
+
+function closeModal() {
+    $('#modalOverlay').classList.remove('active');
+    modalProductId = null;
+}
+
+/* ============ SİDEBAR ============ */
+function openSidebar(name) {
+    $(`#${name}Sidebar`).classList.add('active');
+    $('#overlay').classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+function closeAllSidebars() {
+    $$('.sidebar').forEach(s => s.classList.remove('active'));
+    $('#overlay').classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+/* ============ HERO SLIDER ============ */
+let currentSlide = 0;
+const slidesCount = $$('.hero-slide').length;
+function goToSlide(i) {
+    currentSlide = (i + slidesCount) % slidesCount;
+    $('#heroSlides').style.transform = `translateX(-${currentSlide * 100}%)`;
+    $$('.hero-dot').forEach((d, idx) => d.classList.toggle('active', idx === currentSlide));
+}
+function buildDots() {
+    $('#heroDots').innerHTML = Array.from({length: slidesCount}).map((_,i) =>
+        `<div class="hero-dot ${i===0?'active':''}" data-slide="${i}"></div>`).join('');
+}
+buildDots();
+setInterval(() => goToSlide(currentSlide + 1), 5000);
+
+/* ============ ARAMA / ÖNERİLER ============ */
+function buildSuggestions(query) {
+    const box = $('#searchSuggestions');
+    if (!query.trim()) { box.classList.remove('active'); return; }
+    const q = query.toLowerCase();
+    const matches = PRODUCTS.filter(p =>
+        p.title.toLowerCase().includes(q) || p.category.toLowerCase().includes(q)
+    ).slice(0, 6);
+    if (matches.length === 0) {
+        box.innerHTML = '<div class="suggestion-item" style="color:#999;">Sonuç bulunamadı</div>';
+    } else {
+        box.innerHTML = matches.map(p =>
+            `<div class="suggestion-item" data-id="${p.id}">
+                <img src="${p.img}" alt="${p.title}" onerror="this.outerHTML='<span style=&quot;font-size:22px;&quot;>${p.emoji}</span>';">
+                <div>
+                    <div style="font-weight:500;">${p.title}</div>
+                    <div style="color:#e91e63;font-weight:600;font-size:12px;">${formatPrice(p.price)}</div>
+                </div>
+            </div>`
+        ).join('');
+    }
+    box.classList.add('active');
+}
+
+/* ============ KATEGORİ ============ */
+function setCategory(cat, label) {
+    currentCategory = cat;
+    displayedCount = 10;
+    $('#sectionTitle').textContent = cat === 'all' ? 'Çok Satan Çiçekler' : (label || 'Filtrelenmiş Ürünler');
+    $$('.text-nav a').forEach(a => a.classList.toggle('active', a.dataset.category === cat));
+    $$('.circle-item').forEach(c => c.classList.toggle('active', c.dataset.category === cat));
+    $('#clearFilters').style.display = cat === 'all' && !currentSearch ? 'none' : 'inline-block';
+    renderProducts();
+    document.querySelector('.section-header').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+/* ============ OLAY DİNLEYİCİLERİ ============ */
+document.addEventListener('click', (e) => {
+    // sepete ekle
+    if (e.target.matches('[data-add]')) { addToCart(parseInt(e.target.dataset.add)); return; }
+    // favori
+    if (e.target.matches('[data-fav]')) { toggleFavorite(parseInt(e.target.dataset.fav)); e.stopPropagation(); return; }
+    // hızlı bak
+    if (e.target.matches('[data-quick]')) { openQuickView(parseInt(e.target.dataset.quick)); e.stopPropagation(); return; }
+    // miktar
+    if (e.target.matches('[data-qty]')) {
+        changeQty(parseInt(e.target.dataset.id), e.target.dataset.qty === '+' ? 1 : -1); return;
+    }
+    if (e.target.matches('[data-remove]')) { removeFromCart(parseInt(e.target.dataset.remove)); return; }
+    if (e.target.matches('[data-unfav]')) { toggleFavorite(parseInt(e.target.dataset.unfav)); return; }
+    // sidebar kapat
+    if (e.target.matches('[data-close]')) { closeAllSidebars(); return; }
+    // ürün kartına tıklayınca modal aç (butona değil karta)
+    const card = e.target.closest('.product-card');
+    if (card && !e.target.matches('button') && !e.target.closest('button')) {
+        openQuickView(parseInt(card.dataset.id));
+    }
+    // arama önerisi seçimi
+    const sug = e.target.closest('.suggestion-item');
+    if (sug && sug.dataset.id) {
+        openQuickView(parseInt(sug.dataset.id));
+        $('#searchSuggestions').classList.remove('active');
+        $('#searchInput').value = '';
+    }
+});
+
+// kategoriler (nav)
+$$('.text-nav a').forEach(a => {
+    a.addEventListener('click', (e) => {
+        e.preventDefault();
+        setCategory(a.dataset.category, a.textContent);
+    });
+});
+
+// circle menü
+$$('.circle-item').forEach(c => {
+    c.addEventListener('click', () => {
+        setCategory(c.dataset.category, c.querySelector('span').textContent.replace('<br>', ' '));
+    });
+});
+
+// banner click → kategoriye git
+$$('.banner').forEach(b => {
+    b.addEventListener('click', () => {
+        const titleEl = b.querySelector('.banner-title');
+        if (titleEl) {
+            const map = {
+                'MENEKŞE': 'menekse', 'BEGONYA': 'begonya', 'EGZOTİK': 'egzotik',
+                'SUKULENT': 'sukulent', 'KAKTÜS': 'sukulent', 'YAPRAK': 'yaprak',
+                'YILBAŞI': 'sukulent', 'KAUÇUK': 'yaprak', 'DUA': 'yaprak',
+                'AYNI': 'all', 'NADİR': 'begonya'
+            };
+            const text = titleEl.textContent.toUpperCase();
+            const key = Object.keys(map).find(k => text.includes(k));
+            if (key) setCategory(map[key], titleEl.textContent);
+        }
+    });
+});
+
+// arama
+$('#searchInput').addEventListener('input', (e) => buildSuggestions(e.target.value));
+$('#searchInput').addEventListener('focus', (e) => { if(e.target.value) buildSuggestions(e.target.value); });
+$('#searchBtn').addEventListener('click', () => {
+    currentSearch = $('#searchInput').value.trim();
+    displayedCount = 10;
+    $('#searchSuggestions').classList.remove('active');
+    $('#sectionTitle').textContent = currentSearch ? `"${currentSearch}" için sonuçlar` : 'Çok Satan Çiçekler';
+    $('#clearFilters').style.display = currentSearch ? 'inline-block' : 'none';
+    renderProducts();
+    document.querySelector('.section-header').scrollIntoView({behavior:'smooth'});
+});
+$('#searchInput').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') $('#searchBtn').click();
+});
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('.search-container')) $('#searchSuggestions').classList.remove('active');
+});
+
+// sıralama
+$('#sortSelect').addEventListener('change', (e) => { currentSort = e.target.value; renderProducts(); });
+
+// filtre temizle
+$('#clearFilters').addEventListener('click', () => {
+    currentCategory = 'all'; currentSearch = ''; $('#searchInput').value = '';
+    setCategory('all');
+});
+
+// sepet aç
+$('#cartBtn').addEventListener('click', () => openSidebar('cart'));
+$('#favoriteBtn').addEventListener('click', () => openSidebar('favorites'));
+$('#overlay').addEventListener('click', closeAllSidebars);
+
+// daha fazla
+$('#loadMoreBtn').addEventListener('click', () => {
+    displayedCount += 5;
+    renderProducts();
+});
+
+// modal kapat
+$('#modalClose').addEventListener('click', closeModal);
+$('#modalOverlay').addEventListener('click', (e) => { if (e.target.id === 'modalOverlay') closeModal(); });
+$('#modalAddBtn').addEventListener('click', () => { if (modalProductId) addToCart(modalProductId); });
+$('#modalFavBtn').addEventListener('click', () => {
+    if (modalProductId) {
+        toggleFavorite(modalProductId);
+        const isFav = favorites.includes(modalProductId);
+        $('#modalFavBtn').textContent = isFav ? '♥' : '♡';
+        $('#modalFavBtn').classList.toggle('active', isFav);
+    }
+});
+
+// hero slider butonları
+$('#heroPrev').addEventListener('click', () => goToSlide(currentSlide - 1));
+$('#heroNext').addEventListener('click', () => goToSlide(currentSlide + 1));
+$('#heroDots').addEventListener('click', (e) => {
+    if (e.target.dataset.slide) goToSlide(parseInt(e.target.dataset.slide));
+});
+
+// scroll → sticky header
+window.addEventListener('scroll', () => {
+    $('#mainHeader').classList.toggle('scrolled', window.scrollY > 50);
+});
+
+// mobil menü
+$('#mobileMenuToggle').addEventListener('click', () => {
+    $('#mainNav').classList.toggle('mobile-open');
+});
+
+// newsletter
+$('#newsletterForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const email = $('#newsletterEmail').value;
+    showToast(`Teşekkürler! ${email} adresine indirim kuponun gönderildi 🎁`);
+    $('#newsletterEmail').value = '';
+});
+
+// checkout
+$('#checkoutBtn').addEventListener('click', () => {
+    if (cart.length === 0) {
+        showToast('Önce sepete ürün ekleyin.', 'error');
+        return;
+    }
+    updateOrderSection();
+    closeAllSidebars();
+    document.getElementById('orderSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
+$('#whatsappOrderBtn').addEventListener('click', sendWhatsAppOrder);
+$('#orderForm').addEventListener('submit', (e) => { e.preventDefault(); sendWhatsAppOrder(); });
+
+// ESC ile kapat
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        closeAllSidebars(); closeModal(); closeInfoModal();
+        $('#searchSuggestions').classList.remove('active');
+    }
+});
+
+/* ============ BİLGİ MODAL İÇERİKLERİ ============ */
+const INFO_CONTENT = {
+    about: {
+        title: "🌸 Hakkımızda",
+        body: `
+            <div class="highlight-box">
+                <strong style="color:#c2185b;">Ayyıldız Çiçekçilik</strong> — Bartın Orduyeri'nde bitki tutkunlarının buluşma noktası.
+            </div>
+            <p>Ayyıldız Çiçekçilik olarak Bartın Merkez Orduyeri Mahallesi'nde, doğanın en güzel ve nadide bitkilerini sevdiklerinizle buluşturuyoruz. Yıllardır süren bitki tutkumuzla, sadece bir çiçekçi değil; bitki dostlarınızın güvenilir adresi olmayı hedefliyoruz.</p>
+            <h3>🌿 Neler Sunuyoruz?</h3>
+            <ul>
+                <li><strong>Menekşe Ailesi:</strong> Bardak Menekşesi, Streptocarpus, Episkia, Siningia, Kohleria, Smithiantha ve nadir Afrika menekşesi türleri</li>
+                <li><strong>Begonyalar:</strong> Gelin damat, gül begonya, sarkık begonya, klasik begonya</li>
+                <li><strong>Egzotik Çiçekler:</strong> Küpeli, Hoya mum çiçeği, Gala çiçeği</li>
+                <li><strong>Sukulent & Kaktüsler:</strong> Yılbaşı çiçeği, Pascalya, Kalanchoe, Dikenler Tacı</li>
+                <li><strong>Yaprak Bitkileri:</strong> Fil kulağı, kauçuk çiçeği, dua çiçeği</li>
+            </ul>
+            <h3>💚 Değerlerimiz</h3>
+            <ul>
+                <li>Her bitki özenle seçilir, gerçek bir bitki severin elinden geçer</li>
+                <li>Taze çiçek garantisi ve aynı gün teslimat</li>
+                <li>Bitki bakımı konusunda samimi ve uzman destek</li>
+                <li>Müşteri memnuniyeti her şeyden önce gelir</li>
+            </ul>
+            <p style="margin-top:20px;"><em>Bartın'da herkes için bir bitki, her ev için bir çiçek. 🌸</em></p>
+        `
+    },
+    contact: {
+        title: "📞 İletişim",
+        body: `
+            <h3>📱 WhatsApp</h3>
+            <p>Sipariş, bilgi ve danışma için en hızlı yol:<br>
+                <a href="https://wa.me/905533453040" target="_blank" style="color:#25d366;font-weight:700;font-size:16px;">0553 345 30 40</a><br>
+                Sabit Telefon: <span style="font-weight:700;color:#000;">0378 228 54 65</span>
+            </p>
+            <h3>✉️ E-posta</h3>
+            <p><a href="mailto:ayyildizsongul50@gmail.com" style="color:#e91e63;font-weight:600;">ayyildizsongul50@gmail.com</a></p>
+            <h3>📍 Mağaza Adresi</h3>
+            <p>Bartın / Merkez<br>Orduyeri Mahallesi</p>
+            <h3>🕒 Çalışma Saatleri</h3>
+            <ul>
+                <li>Pazartesi - Cumartesi: <strong>09:00 - 20:00</strong></li>
+                <li>Pazar: Kapalı</li>
+            </ul>
+            <div class="highlight-box">
+                💬 WhatsApp üzerinden gönderdiğiniz tüm mesajlara çalışma saatleri içinde en geç 30 dakika içerisinde dönüş yapılır.
+            </div>
+        `
+    },
+    delivery: {
+        title: "🚚 Teslimat Bilgileri",
+        body: `
+            <h3>📦 Teslimat Bölgeleri</h3>
+            <ul>
+                <li><strong>Bartın Merkez:</strong> Aynı gün teslimat</li>
+                <li><strong>Bartın İlçeler:</strong> 1-2 iş günü içinde teslimat</li>
+                <li>Yurt geneli kargo seçeneği için WhatsApp üzerinden iletişime geçin</li>
+            </ul>
+            <h3>⏰ Teslimat Saatleri</h3>
+            <ul>
+                <li>12:00'ye kadar verilen siparişler <strong>aynı gün</strong> teslim edilir</li>
+                <li>12:00 sonrası alınan siparişler <strong>ertesi iş günü</strong> ulaştırılır</li>
+                <li>Hafta sonu (Pazar) teslimat yapılmaz, Pazartesi gönderilir</li>
+            </ul>
+            <h3>💰 Kargo Ücretleri</h3>
+            <ul>
+                <li>250 TL ve üzeri Bartın Merkez siparişlerinde <strong>ÜCRETSİZ</strong> teslimat</li>
+                <li>250 TL altı siparişlerde 50 TL teslimat ücreti</li>
+                <li>İlçe ve şehir dışı kargo ücreti sipariş onayında bildirilir</li>
+            </ul>
+            <div class="highlight-box">
+                🌸 Tüm canlı bitkiler özel paketleme ile, hasarsız ve taze şekilde size ulaştırılır. Teslimat anında alıcı yoksa komşu/kapıcıya bırakma için onayınız WhatsApp'tan alınır.
+            </div>
+        `
+    },
+    returns: {
+        title: "↩️ İade ve Değişim Koşulları",
+        body: `
+            <div class="highlight-box">
+                Memnuniyetiniz önceliğimiz. Bitki canlı bir varlıktır; aşağıdaki koşullar gerçek dünya pratiğine göre düzenlenmiştir.
+            </div>
+            <h3>✅ İade Hakkı</h3>
+            <ul>
+                <li>Teslimat anında <strong>hasarlı, sağlıksız veya siparişten farklı</strong> bir ürün geldiyse, ürünü açar açmaz fotoğraflayın</li>
+                <li>24 saat içinde WhatsApp üzerinden (0553 345 30 40) tarafımıza fotoğrafları gönderin</li>
+                <li>Onaylanan iadelerde 3 seçenek sunulur:
+                    <ul style="padding-left:20px;margin-top:5px;">
+                        <li>Aynı ürünle ücretsiz değişim</li>
+                        <li>Eşdeğer başka bir ürünle değişim</li>
+                        <li>Tam para iadesi (ödeme şeklinize uygun yöntemle)</li>
+                    </ul>
+                </li>
+            </ul>
+            <h3>❌ İade Kapsamı Dışındakiler</h3>
+            <ul>
+                <li>Teslimat sonrası <strong>bakım yetersizliğinden</strong> (aşırı sulama, susuz bırakma, güneşsiz ortam vb.) kaynaklanan solma/kuruma</li>
+                <li>Doğal sebeplerle yaprak dökümü (her bitki birkaç yaprağını yeniler — bu normaldir)</li>
+                <li>Teslimat sonrası 48 saat geçmiş şikayetler (canlı ürünün durumu hızla değişebilir)</li>
+                <li>Özel sipariş üzerine getirilen nadir/ithal türler (sipariş öncesi belirtilir)</li>
+            </ul>
+            <h3>🔁 Değişim Süreci</h3>
+            <ol style="padding-left:20px;line-height:2;">
+                <li>WhatsApp'tan iletişime geçin ve durumu fotoğraflarla bildirin</li>
+                <li>Talep onayı 1 iş günü içinde verilir</li>
+                <li>Onaylanan değişim ürünü 1-2 iş günü içinde gönderilir</li>
+                <li>Para iadesi onay sonrası 5-7 iş günü içinde tamamlanır</li>
+            </ol>
+            <h3>📞 Destek</h3>
+            <p>Her türlü iade/değişim/şikayet için:<br>
+            WhatsApp: <a href="https://wa.me/905533453040" target="_blank" style="color:#25d366;font-weight:700;">0553 345 30 40</a><br>
+            Sabit Telefon: <strong>0378 228 54 65</strong><br>
+            E-posta: <a href="mailto:ayyildizsongul50@gmail.com" style="color:#e91e63;">ayyildizsongul50@gmail.com</a></p>
+        `
+    },
+    faq: {
+        title: "❓ Sıkça Sorulan Sorular",
+        body: `
+            <h3>🚚 Bartın dışına gönderiyor musunuz?</h3>
+            <p>Evet, kargo ile Türkiye genelinde gönderim yapıyoruz. Canlı bitkiler için özel paketleme uyguluyoruz. Detaylar için WhatsApp'tan iletişime geçin.</p>
+            <h3>💧 Bitkilerin bakımı zor mu?</h3>
+            <p>Sunduğumuz çiçeklerin neredeyse tamamı evde rahatlıkla yetiştirilebilir. Her sipariş ile birlikte bitkinizin özel bakım rehberi gönderilir.</p>
+            <h3>🎁 Hediye olarak gönderebilir miyim?</h3>
+            <p>Tabii ki! Sipariş notuna "hediye" yazın, isteyenler için kart yazısı da hazırlıyoruz. Fiyat etiketi konulmadan kargolanır.</p>
+            <h3>💳 Ödeme nasıl yapılır?</h3>
+            <p>Havale/EFT, kapıda nakit veya kapıda kart (Bartın Merkez) seçenekleri mevcuttur. WhatsApp üzerinden sipariş onayı sonrası ödeme bilgileri paylaşılır.</p>
+            <h3>🌱 Çiçeğim soldu, ne yapmalıyım?</h3>
+            <p>WhatsApp'tan fotoğraf gönderin, bakım önerileri ücretsiz veriyoruz. Çoğu durum çözümlenebilir!</p>
+            <h3>🪴 Saksıyı ben mi seçebilirim?</h3>
+            <p>Evet. Sipariş öncesi WhatsApp'tan istediğiniz saksı türü/rengi belirtin, mevcut olanlardan seçim yapabilirsiniz.</p>
+        `
+    },
+    privacy: {
+        title: "🔒 Gizlilik Sözleşmesi",
+        body: `
+            <p>Ayyıldız Çiçekçilik olarak kişisel bilgilerinizin güvenliğini önemsiyoruz.</p>
+            <h3>📋 Toplanan Bilgiler</h3>
+            <ul>
+                <li>Ad-soyad, telefon, adres (sadece teslimat için)</li>
+                <li>E-posta (sadece sipariş bildirimleri ve isteğe bağlı bülten için)</li>
+                <li>Ödeme bilgileri (saklanmaz, doğrudan güvenli kanallarda işlenir)</li>
+            </ul>
+            <h3>🛡️ Bilgi Kullanımı</h3>
+            <ul>
+                <li>Bilgileriniz sadece siparişinizi hazırlamak ve size ulaştırmak için kullanılır</li>
+                <li>3. kişilerle paylaşılmaz, satılmaz, kiraya verilmez</li>
+                <li>Bülten aboneliğinizi istediğiniz an iptal edebilirsiniz</li>
+            </ul>
+            <h3>🍪 Çerezler</h3>
+            <p>Site, sepet ve favori bilgilerinizi tarayıcınızda saklamak için yerel depolama (localStorage) kullanır. Kişisel olmayan, sadece site içi deneyimi iyileştiren bilgilerdir.</p>
+            <h3>📞 Talepleriniz</h3>
+            <p>Kişisel verilerinizin silinmesi, görüntülenmesi veya değiştirilmesi için <a href="mailto:ayyildizsongul50@gmail.com" style="color:#e91e63;">ayyildizsongul50@gmail.com</a> adresine yazabilirsiniz.</p>
+        `
+    },
+    care: {
+        title: "🌱 Bitki Bakım Rehberi",
+        body: `
+            <h3>💧 Genel Sulama Kuralları</h3>
+            <ul>
+                <li>Toprağın üst 2-3 cm'i kuruduğunda sulayın</li>
+                <li>Saksı altında biriken suyu mutlaka boşaltın</li>
+                <li>Kış aylarında sulama sıklığını azaltın</li>
+            </ul>
+            <h3>☀️ Işık</h3>
+            <ul>
+                <li><strong>Menekşeler & Begonyalar:</strong> Dolaylı parlak ışık (doğrudan güneş yakar)</li>
+                <li><strong>Sukulent & Kaktüsler:</strong> Bol güneş (günde 4-6 saat)</li>
+                <li><strong>Yaprak bitkileri:</strong> Orta seviye dolaylı ışık</li>
+            </ul>
+            <h3>🌡️ Sıcaklık</h3>
+            <ul>
+                <li>İdeal oda sıcaklığı: 18-24°C</li>
+                <li>Klima ve kalorifer önünden uzak tutun</li>
+                <li>Pencere kenarında soğuk camdan koruyun</li>
+            </ul>
+            <h3>🌿 Bitki Özel Önerileri</h3>
+            <ul>
+                <li><strong>Bardak Menekşesi & Sinningia:</strong> Yaprak ıslatılmamalı, kökten sulanmalı</li>
+                <li><strong>Hoya:</strong> Kuru tarafa eğilim, az ama düzenli sulama</li>
+                <li><strong>Yılbaşı/Pascalya çiçeği:</strong> Çiçek açma döneminde yer değiştirmeyin</li>
+                <li><strong>Dua çiçeği:</strong> Yüksek nem sever, ara sıra yapraklarına su püskürtün</li>
+            </ul>
+            <div class="highlight-box">
+                💚 Bitkinizle ilgili her sorunuzda WhatsApp'tan bize ulaşabilirsiniz — bakım danışmanlığı ücretsiz!
+            </div>
+        `
+    }
+};
+
+function openInfoModal(key) {
+    const content = INFO_CONTENT[key];
+    if (!content) return;
+    $('#infoModalTitle').innerHTML = content.title;
+    $('#infoModalBody').innerHTML = content.body;
+    $('#infoModalOverlay').classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+function closeInfoModal() {
+    $('#infoModalOverlay').classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+// Bilgi modal click handler
+document.addEventListener('click', (e) => {
+    const trigger = e.target.closest('[data-info]');
+    if (trigger) {
+        e.preventDefault();
+        openInfoModal(trigger.dataset.info);
+    }
+});
+$('#infoModalClose').addEventListener('click', closeInfoModal);
+$('#infoModalOverlay').addEventListener('click', (e) => {
+    if (e.target.id === 'infoModalOverlay') closeInfoModal();
+});
+
+/* ============ İLK YÜKLEME ============ */
+renderProducts();
+updateCartUI();
+updateFavUI();
+</script>
+
+</body>
+</html>
