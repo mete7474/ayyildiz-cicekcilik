@@ -725,24 +725,113 @@
             .hero-buttons { justify-content: center; }
         }
         @media (max-width: 768px) {
-            .mobile-menu-toggle { display: block; }
+            /* Header — iki satıra böl: üst(logo+ikon) / alt(arama) */
+            .header-top { flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+            .mobile-menu-toggle { display: block; order: 1; padding: 10px 6px; }
+            .logo { order: 2; flex: 1; font-size: 17px; gap: 10px; }
+            .logo img { height: 48px; border-radius: 16px; }
+            .header-actions { order: 3; gap: 6px; }
+            .header-actions .action-item span:not(.icon):not(.badge) { display: none; }
+            .search-container { order: 4; max-width: 100%; flex-basis: 100%; }
+            .search-box input { font-size: 16px; } /* iOS zoom engellemek için */
+
+            /* Touch target büyütme */
+            .action-item { padding: 10px 8px; min-height: 44px; }
+            .cart-btn { padding: 10px 14px; min-height: 44px; }
+            .add-to-cart { padding: 12px 10px; min-height: 44px; }
+
+            /* Duyuru barı */
+            .announcement-bar { padding: 8px 40px 8px 12px; font-size: 11px; }
+
+            /* Mobil nav */
             .text-nav { display: none; }
             .text-nav.mobile-open {
-                display: flex; flex-direction: column; gap: 10px;
-                padding: 15px; background: #fafafa; border-radius: 6px;
+                display: flex; flex-direction: column; gap: 0;
+                background: #fff; border: 1px solid #f0ebf1; border-radius: 8px;
+                overflow: hidden; margin-top: 4px;
             }
-            .hero-cta, .hero-outline { width: 100%; }
-            .search-container { order: 3; max-width: 100%; flex-basis: 100%; }
-            .row-2, .row-3 { grid-template-columns: 1fr; height: auto; }
-            .row-2 > div, .row-3 > div { height: 130px; }
-            .header-actions { gap: 10px; }
-            .header-actions .action-item:not(.cart-btn) span:not(.badge) { display: none; }
+            .text-nav.mobile-open a {
+                padding: 13px 16px; border-bottom: 1px solid #f5f5f5; font-size: 14px;
+            }
+            .text-nav.mobile-open a:last-child { border-bottom: none; }
+            .text-nav.mobile-open a.active::after { display: none; }
+
+            /* Hero slider */
+            .hero-slider { height: 210px; }
+            .banner .banner-title { font-size: 16px; letter-spacing: 0.5px; }
+            .banner .banner-sub { font-size: 12px; margin-bottom: 12px; }
+            .hero-cta, .hero-outline { width: 100%; padding: 12px 16px; font-size: 13px; justify-content: center; }
+
+            /* Banner satırları */
+            .row-2, .row-3 { grid-template-columns: 1fr; height: auto; gap: 10px; }
+            .row-2 > div, .row-3 > div { height: 110px; }
+
+            /* Ürün bölümü */
             .section-header { flex-direction: column; align-items: flex-start; }
-            .newsletter { padding: 25px; flex-direction: column; text-align: center; }
-            .newsletter-form { width: 100%; }
-            .order-grid, .contact-section { grid-template-columns: 1fr; }
-            .checkout-section, .contact-section { padding: 22px; }
-            .order-card, .contact-card { padding: 20px; }
+            .sort-filter { width: 100%; }
+            .sort-filter select { flex: 1; min-width: 0; }
+
+            /* Ürün kartları */
+            .products-grid { gap: 12px; }
+            .product-img { height: 170px; }
+            .product-title { font-size: 12px; }
+
+            /* Newsletter */
+            .newsletter { padding: 20px; flex-direction: column; text-align: center; gap: 16px; }
+            .newsletter-form { width: 100%; flex-direction: column; max-width: 100%; }
+            .newsletter-form input, .newsletter-form button { width: 100%; }
+
+            /* Checkout / İletişim */
+            .order-grid, .contact-section { grid-template-columns: 1fr; gap: 16px; }
+            .checkout-section, .contact-section { padding: 16px; margin: 20px 0; }
+            .order-card, .contact-card { padding: 16px; }
+            .checkout-section h2, .contact-section h2, .order-card h3, .contact-card h3 { font-size: 18px; }
+
+            /* Footer */
+            .footer-grid { grid-template-columns: 1fr 1fr; gap: 20px; }
+
+            /* Modal */
+            .modal { grid-template-columns: 1fr; max-height: 95vh; border-radius: 10px 10px 0 0; }
+            .modal-img { min-height: 200px; max-height: 250px; }
+            .modal-content { padding: 20px; }
+
+            /* Sidebar tam genişlik */
+            .sidebar { width: 100%; right: -100%; }
+        }
+
+        @media (max-width: 480px) {
+            /* Çok küçük ekranlar (eski iPhone / küçük Android) */
+            .logo { font-size: 14px; gap: 8px; }
+            .logo img { height: 40px; }
+            .logo span { font-size: 14px; }
+
+            .hero-slider { height: 185px; }
+            .hero-slide .banner-content { padding: 14px; }
+            .hero-buttons { gap: 8px; }
+
+            .circle-img { width: 60px; height: 60px; font-size: 28px; }
+            .circle-item { min-width: 64px; gap: 7px; }
+            .circle-item span { font-size: 10px; }
+
+            .products-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+            .product-img { height: 145px; }
+            .product-title { font-size: 11px; }
+            .price { font-size: 15px; }
+            .add-to-cart { font-size: 12px; padding: 10px 6px; }
+
+            .section-header h2 { font-size: 17px; }
+
+            .footer-grid { grid-template-columns: 1fr; }
+            .footer-col h4 { margin-bottom: 8px; }
+
+            .whatsapp-float { width: 52px; height: 52px; font-size: 26px; bottom: 16px; right: 16px; }
+
+            .toast { min-width: calc(100vw - 40px); max-width: calc(100vw - 40px); }
+
+            .info-modal-header { padding: 18px 20px; }
+            .info-modal-body { padding: 20px; }
+
+            .newsletter-text h3 { font-size: 17px; }
         }
     </style>
 </head>
