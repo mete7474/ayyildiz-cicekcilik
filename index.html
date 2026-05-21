@@ -756,7 +756,7 @@
             .mobile-menu-toggle { display: block; order: 1; padding: 10px 6px; }
             .logo { order: 2; flex: 1; font-size: 17px; gap: 10px; }
             .logo img { height: 48px; border-radius: 16px; }
-            .header-actions { order: 3; gap: 6px; }
+            .header-actions { order: 3; gap: 6px; margin-left: auto; }
             .header-actions .action-item span:not(.icon):not(.badge) { display: none; }
             .search-container { order: 4; max-width: 100%; flex-basis: 100%; }
             .search-box input { font-size: 16px; } /* iOS zoom engellemek için */
@@ -928,6 +928,10 @@
 
     <!-- Yuvarlak Kategori -->
     <section class="circle-menu" id="circleMenu">
+        <div class="circle-item active" data-category="all">
+            <div class="circle-img" style="background: linear-gradient(135deg, #fce4ec, #e91e63);">🌼</div>
+            <span>Tümü</span>
+        </div>
         <div class="circle-item" data-category="menekse">
             <div class="circle-img" style="background: linear-gradient(135deg, #f3e5f5, #ce93d8);">🌸</div>
             <span>Menekşe<br>Ailesi</span>
